@@ -28,7 +28,7 @@
 
 	<scm>
 		<connection>scm:git:https://github.com/LevelOneProject/interop-mule-connector-metrics</connection>
-		<developerConnection>scm:git:git@github.com/LevelOneProject/interop-mule-connector-metrics</developerConnection>
+		<developerConnection>scm:git:https://github.com/LevelOneProject/interop-mule-connector-metrics</developerConnection>
 		<url>https://github.com/LevelOneProject/interop-mule-connector-metrics</url>
 		<tag>HEAD</tag>
 		<!--<developerConnection>scm:git:git@github.com:mulesoft/mule-devkit-parent.git</developerConnection>-->
