@@ -3,7 +3,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>interop-mule-connector-metrics</artifactId>
-	<version>1.0.4-SNAPSHOT</version>
+	<version>1.0.4</version>
 	<packaging>mule-module</packaging>
 	<name>Mule Metrics Anypoint Connector</name>
 
@@ -29,7 +29,7 @@
 		<connection>scm:git:https://github.com/LevelOneProject/interop-mule-connector-metrics</connection>
 		<developerConnection>scm:git:https://github.com/LevelOneProject/interop-mule-connector-metrics</developerConnection>
 		<url>https://github.com/LevelOneProject/interop-mule-connector-metrics</url>
-		<tag>HEAD</tag>
+		<tag>interop-mule-connector-metrics-1.0.4</tag>
 		<!--<developerConnection>scm:git:git@github.com:mulesoft/mule-devkit-parent.git</developerConnection>-->
 	</scm>
 	
