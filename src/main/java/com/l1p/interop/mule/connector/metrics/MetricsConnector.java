@@ -1,4 +1,4 @@
-package org.mule.modules.metrics;
+package com.l1p.interop.mule.connector.metrics;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -7,9 +7,6 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.websocket.DeploymentException;
-
-import org.glassfish.tyrus.server.Server;
 import org.mule.api.MuleEvent;
 import org.mule.api.annotations.Config;
 import org.mule.api.annotations.Connector;
@@ -19,12 +16,9 @@ import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.api.transport.PropertyScope;
-import org.mule.modules.metrics.config.ConnectorConfig;
-import org.mule.modules.metrics.reporter.WebSocket;
-import org.mule.modules.metrics.reporter.WebSocketReporter;
-import org.mule.modules.metrics.spring.GaugeBean;
-import org.mule.modules.metrics.spring.GaugeBeanInterface;
-import org.mule.modules.metrics.websocket.MetricsWebSocketEndpoint;
+import com.l1p.interop.mule.connector.metrics.config.ConnectorConfig;
+import com.l1p.interop.mule.connector.metrics.spring.GaugeBean;
+import com.l1p.interop.mule.connector.metrics.spring.GaugeBeanInterface;
 import org.mule.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,59 +37,8 @@ public class MetricsConnector {
 	@Config
 	ConnectorConfig config;
 
-	private Server server;
-
 	@Start
 	public void startConnector() {
-
-		/* ==================================================== */
-		/* Star WebServer */
-		/* ==================================================== */
-
-		if (config.isServerembedded()) {
-
-			/* ==================================================== */
-			/* Start WebServer */
-			/* ==================================================== */
-
-			server = new Server(config.getHost(), config.getPort(), "/"
-					+ config.getServicename(), null,
-					MetricsWebSocketEndpoint.class);
-
-			try {
-				server.start();
-			} catch (DeploymentException e) {
-				log.error("Failed to start websocket server", e);
-			}
-
-		}
-
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-		/* ==================================================== */
-		/* Add WebSocket Reporter */
-		/* ==================================================== */
-
-		if (!config.getHost().isEmpty()) {
-
-			final WebSocket websocket = new WebSocket(config.getHost(),
-					config.getPort(), config.getServicename(),
-					config.isServerembedded());
-
-			final WebSocketReporter reporter = WebSocketReporter
-					.forRegistry(config.getMetricRegistry())
-					.convertRatesTo(TimeUnit.SECONDS)
-					.convertDurationsTo(TimeUnit.MILLISECONDS)
-					.filter(MetricFilter.ALL).build(websocket);
-
-			config.getScheduledReporters().add(reporter);
-
-		}
 
 		/* ==================================================== */
 		/* Star Reporters */
@@ -127,15 +70,6 @@ public class MetricsConnector {
 			} catch (Exception e) {
 				log.error("Failed to stop metric report", e);
 			}
-		}
-
-		/* ==================================================== */
-		/* Stop WebServer */
-		/* ==================================================== */
-
-		if (config.isServerembedded()) {
-
-			server.stop();
 		}
 
 	}
@@ -221,8 +155,8 @@ public class MetricsConnector {
 	/**
 	 * Decrement counters specified by metricKeys
 	 *
-	 * @param metricKeys
-	 *            keys for metrics that need to be incremented
+	 * @param event
+	 * @param gaugeList
 	 */
 	@Processor(friendlyName = "Add Gauge")
 	public void addGauge(final MuleEvent event, @Optional List<String> gaugeList) {
@@ -301,9 +235,4 @@ public class MetricsConnector {
 	public void setConfig(ConnectorConfig config) {
 		this.config = config;
 	}
-
-	public Server getServer() {
-		return server;
-	}
-
 }

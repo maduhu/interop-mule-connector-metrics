@@ -19,10 +19,10 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
         </spring:bean> 
          <spring:bean id="metricRegistry" scope="singleton" class="com.codahale.metrics.MetricRegistry">
         </spring:bean>
-        <spring:bean id="consoleReporter" class="org.mule.modules.metrics.spring.ReporterFactory" factory-method="createConsoleReporter">
+        <spring:bean id="consoleReporter" class="com.l1p.interop.mule.connector.metrics.spring.ReporterFactory" factory-method="createConsoleReporter">
             <spring:constructor-arg ref="metricRegistry"/>
         </spring:bean>
-        <spring:bean id="slf4jReporter" class="org.mule.modules.metrics.spring.ReporterFactory" factory-method="createSlf4jReporter">
+        <spring:bean id="slf4jReporter" class="com.l1p.interop.mule.connector.metrics.spring.ReporterFactory" factory-method="createSlf4jReporter">
            <spring:constructor-arg ref="metricRegistry"/>
        </spring:bean>
        <util:list id="scheduledReporters">

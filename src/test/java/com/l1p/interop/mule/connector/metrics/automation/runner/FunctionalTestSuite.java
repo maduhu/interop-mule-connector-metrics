@@ -1,12 +1,12 @@
-package org.mule.modules.metrics.automation.runner;
+package com.l1p.interop.mule.connector.metrics.automation.runner;
 
+import com.l1p.interop.mule.connector.metrics.MetricsConnector;
+import com.l1p.interop.mule.connector.metrics.automation.functional.GreetTestCases;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.mule.modules.metrics.automation.functional.GreetTestCases;
-import org.mule.modules.metrics.MetricsConnector;
 import org.mule.tools.devkit.ctf.mockup.ConnectorTestContext;
 
 @RunWith(Suite.class)

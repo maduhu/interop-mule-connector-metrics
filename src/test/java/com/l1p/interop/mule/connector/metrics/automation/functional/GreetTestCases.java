@@ -1,10 +1,9 @@
-package org.mule.modules.metrics.automation.functional;
+package com.l1p.interop.mule.connector.metrics.automation.functional;
 
-import static org.junit.Assert.*;
+import com.l1p.interop.mule.connector.metrics.MetricsConnector;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mule.modules.metrics.MetricsConnector;
 import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
 
 public class GreetTestCases extends

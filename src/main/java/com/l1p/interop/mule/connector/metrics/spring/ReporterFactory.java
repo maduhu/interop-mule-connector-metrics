@@ -1,4 +1,4 @@
-package org.mule.modules.metrics.spring;
+package com.l1p.interop.mule.connector.metrics.spring;
 
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.MetricRegistry;

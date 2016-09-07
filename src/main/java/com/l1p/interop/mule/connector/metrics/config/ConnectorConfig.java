@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2016, W Modus LLC. All rights reserved.
  */
-package org.mule.modules.metrics.config;
+package com.l1p.interop.mule.connector.metrics.config;
 
 import java.util.Collections;
 import java.util.List;

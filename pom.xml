@@ -19,8 +19,17 @@
 		<licensePath>LICENSE.md</licensePath>
 		<devkit.studio.package.skip>false</devkit.studio.package.skip>
 		<tyrus.version>1.1</tyrus.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<mule.version>3.8.0</mule.version>
+		<mule.tools.version>1.2</mule.tools.version>
+		<munit.version>1.2.0</munit.version>
+		<mule.munit.support.version>3.8.0</mule.munit.support.version>
+		<apikit.version>3.8.0</apikit.version>
+		<project.scm.id>git</project.scm.id>
 	</properties>
-	
+
 	<scm>
 		<connection>scm:git:https://github.com/LevelOneProject/interop-mule-connector-metrics</connection>
 		<tag>HEAD</tag>
@@ -140,10 +149,10 @@
 			<version>3.1.2</version>
 		</dependency>
 		<!-- https://tyrus.java.net/documentation/1.13/index/modules-and-dependencies.html -->
-		<dependency>
-			<groupId>org.mule.modules</groupId>
-			<artifactId>metrics-websocket-report</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>org.mule.modules</groupId>-->
+			<!--<artifactId>metrics-websocket-report</artifactId>-->
+			<!--<version>1.0.0-SNAPSHOT</version>-->
+		<!--</dependency>-->
 	</dependencies>
 </project>
