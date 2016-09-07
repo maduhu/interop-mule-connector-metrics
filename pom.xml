@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.l1p.interop</groupId>
+	<artifactId>interop-mule-connector-metrics</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>mule-module</packaging>
+	<name>Mule Metrics Anypoint Connector</name>
+
+	<parent>
+		<groupId>org.mule.tools.devkit</groupId>
+		<artifactId>mule-devkit-parent</artifactId>
+		<version>3.8.0</version>
+	</parent>
+	<properties>
+		<category>Community</category>
+		<licensePath>LICENSE.md</licensePath>
+		<devkit.studio.package.skip>false</devkit.studio.package.skip>
+		<tyrus.version>1.1</tyrus.version>
+	</properties>
+	
+	<scm>
+		<connection>scm:git:https://github.com/LevelOneProject/interop-mule-connector-metrics</connection>
+		<tag>HEAD</tag>
+	</scm>
+	
+	<distributionManagement>
+		<repository>
+			<id>modusbox-release-local</id>
+			<name>libs-release-local</name>
+			<url>https://modusbox.jfrog.io/modusbox/libs-release-local</url>
+		</repository>
+		<snapshotRepository>
+			<id>modusbox-snapshot-local</id>
+			<name>libs-snapshot-local</name>
+			<url>https://modusbox.jfrog.io/modusbox/libs-snapshot-local</url>
+		</snapshotRepository>
+	</distributionManagement>
+	
+	<build>
+		<plugins>
+			<!--
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>2.5.2</version>
+			</plugin>
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5.3</version>
+			</plugin>
+			<plugin>
+				<groupId>org.mule.tools.maven</groupId>
+				<artifactId>mule-app-maven-plugin</artifactId>
+				<version>${mule.tools.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<copyToAppsDirectory>false</copyToAppsDirectory>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.1</version>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>project</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>add-resource</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>add-resource</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>src/main/app/</directory>
+								</resource>
+								<resource>
+									<directory>src/main/resources/</directory>
+								</resource>
+								<resource>
+									<directory>src/main/api/</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.mulesoft.munit.tools</groupId>
+				<artifactId>munit-maven-plugin</artifactId>
+				<version>${munit.version}</version>
+				<executions>
+					<execution>
+						<id>test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>test</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<coverage>
+						<runCoverage>true</runCoverage>
+						<formats>
+							<format>html</format>
+						</formats>
+					</coverage>
+				</configuration>
+			</plugin>
+		</plugins>
+		<testResources>
+			<testResource>
+				<directory>src/test/munit</directory>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
+	</build>
+	
+	
+	<dependencies>
+		<!-- https://mvnrepository.com/artifact/io.dropwizard.metrics/metrics-core -->
+		<dependency>
+			<groupId>io.dropwizard.metrics</groupId>
+			<artifactId>metrics-core</artifactId>
+			<version>3.1.2</version>
+		</dependency>
+		<!-- https://tyrus.java.net/documentation/1.13/index/modules-and-dependencies.html -->
+		<dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>metrics-websocket-report</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+</project>

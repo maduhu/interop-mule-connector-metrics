@@ -1,0 +1,6 @@
+<!-- BEGIN_INCLUDE(metrics:greet) -->
+    <metrics:greet config-ref="" friend="#[map-payload:friend]" />
+    <metrics:snap-time name="foo"/>
+    <metrics:snap-time name="bar"/>
+    <metrics:timer name="foo.bar" begin-snap="foo" end-snap="bar"/>
+<!-- END_INCLUDE(metrics:greet) -->

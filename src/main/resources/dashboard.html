@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Metrics WebSocket Client</title>
+<script type="text/javascript">
+	
+	var socket = null;
+	
+	window.onload = init;
+	
+	
+	var updateAutomatically = false;
+
+	function starWebSocket() {
+	
+		socket = new WebSocket("${service}");
+		
+		socket.onopen = function(event) {
+			  var socketStatus = document.getElementById('status');
+			  socketStatus.innerHTML = 'Connected to: ' + event.currentTarget.url;
+			  socketStatus.className = 'open';
+		};
+			
+		socket.onerror = function(error) {
+			  console.log('WebSocket Error connecting to: ' + error.currentTarget.url);
+			  var socketStatus = document.getElementById('status');
+			  socketStatus.innerHTML = 'Error connecting to: ' + error.currentTarget.url;
+		};
+		
+		socket.onmessage = onMessage;
+		
+	}
+	
+	function onMessage(event) {
+		
+		var metrics = JSON.parse(event.data);
+		
+		if (metrics.action === "add") {
+			printMetricsElement(metrics);
+		}
+		if (metrics.action === "remove") {
+			document.getElementById(metrics.id).remove();
+
+		}
+		if (metrics.action === "update") {
+			updateMetrics(metrics);
+		}
+		
+	}
+
+	function addMetrics(category) {
+		var MetricsAction = {
+			action : "add",
+			category : category 
+		};
+		socket.send(JSON.stringify(MetricsAction));
+	}
+
+	function removeMetrics(element) {
+		var id = element.id;
+		var MetricsAction = {
+			action : "remove",
+			id : id
+		};
+		socket.send(JSON.stringify(MetricsAction));
+	}
+	
+	function updateMetrics(metrics) {
+		
+			var metricsDescription = document.getElementById(metrics.type + "_" + metrics.category);
+			
+			if(metricsDescription != null)
+			{
+				updateMetricsElement(metrics);
+			
+			}
+			else
+			{
+				if(updateAutomatically)
+				{
+					printMetricsElement(metrics);
+				}
+				
+			}
+		 
+	}
+
+	function updateMetricsElement(metrics) {
+		
+		var content = document.getElementById(metrics.id);
+		
+		if(metrics.type === "Counter")
+		{
+			if(content == null)
+			{
+			
+				var metricsDescription = document.createElement("span");
+				metricsDescription.setAttribute("id", metrics.id);
+				metricsDescription.setAttribute("class", "metricsValue");
+				metricsDescription.innerHTML = "<b>"+ metrics.name +"</b> " + metrics.value.count;
+				
+				var contentMetric = document.getElementById(metrics.type + "_" + metrics.category);
+				
+				var height = parseInt(contentMetric.clientHeight) + 12;
+				contentMetric.style.height = height.toString() + "px";
+				 
+				var link = document.getElementById("link_" + metrics.category);
+				
+				contentMetric.insertBefore(metricsDescription,link);
+			
+			
+			}else
+			{
+		
+				content.innerHTML = "<b>"+ metrics.name +"</b> " + metrics.value.count;
+				
+			}
+		}
+		
+		if(metrics.type === "Timer")
+		{
+			
+			if(content == null)
+			{
+			
+				var metricsDescription = document.createElement("span");
+				metricsDescription.setAttribute("id", metrics.id);
+				metricsDescription.setAttribute("class", "metricsValue");
+				
+				metricsDescription.innerHTML = "<p><b>"+ metrics.name +"</b></p><p> Max: " + metrics.value.max + "</p>" ;
+				metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> Mean: " + metrics.value.mean + "</p>" ;
+				metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> Min: " + metrics.value.min + "</p>" ;
+				metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> Stddev: " + metrics.value.stddev + "</p>" ;
+				metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> P50: " + metrics.value.p50 + "</p>" ;
+				metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> P75: " + metrics.value.p75 + "</p>" ;
+				metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> P95: " + metrics.value.p95 + "</p>" ;
+				metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> P98: " + metrics.value.p98 + "</p>" ;
+				metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> P99: " + metrics.value.p99 + "</p>" ;
+				metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> P999: " + metrics.value.p999 + "</p>" ;
+				
+				var contentMetric = document.getElementById(metrics.category);
+				
+				var height = parseInt(contentMetric.clientHeight) + 12;
+				contentMetric.style.height = height.toString() + "px";
+				 
+				var link = document.getElementById("link_" + metrics.category);
+				
+				contentMetric.insertBefore(metricsDescription,link);
+			
+			
+			}else
+			{
+		
+				content.innerHTML = "<p><b>"+ metrics.name +"</b></p><p> Max: " + metrics.value.max + "</p>" ;
+				content.innerHTML = content.innerHTML  + "<p> Mean: " + metrics.value.mean + "</p>" ;
+				content.innerHTML = content.innerHTML  + "<p> Min: " + metrics.value.min + "</p>" ;
+				content.innerHTML = content.innerHTML  + "<p> Stddev: " + metrics.value.stddev + "</p>" ;
+				content.innerHTML = content.innerHTML  + "<p> P50: " + metrics.value.p50 + "</p>" ;
+				content.innerHTML = content.innerHTML  + "<p> P75: " + metrics.value.p75 + "</p>" ;
+				content.innerHTML = content.innerHTML  + "<p> P95: " + metrics.value.p95 + "</p>" ;
+				content.innerHTML = content.innerHTML  + "<p> P98: " + metrics.value.p98 + "</p>" ;
+				content.innerHTML = content.innerHTML  + "<p> P99: " + metrics.value.p99 + "</p>" ;
+				content.innerHTML = content.innerHTML  + "<p> P999: " + metrics.value.p999 + "</p>" ;
+				
+				
+			}
+			
+		}
+		
+		if(metrics.type === "Meter")
+		{
+			
+			if(content == null)
+			{
+			
+				var metricsDescription = document.createElement("span");
+				metricsDescription.setAttribute("id", metrics.id);
+				metricsDescription.setAttribute("class", "metricsValue");
+				metricsDescription.innerHTML = "<p><b>"+ metrics.name +"</b></p><p> Count: " + metrics.value.count + "</p>" ;
+				metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> M1 Rate: " + metrics.value.m1_rate + "</p>" ;
+				metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> M5 Rate: " + metrics.value.m5_rate + "</p>" ;
+				metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> M15 Rate: " + metrics.value.m15_rate + "</p>" ;
+				metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> Mean Rate: " + metrics.value.mean_rate + "</p>" ;
+				
+				
+				var contentMetric = document.getElementById(metrics.category);
+				
+				var height = parseInt(contentMetric.clientHeight) + ( 12 * 5 );
+				contentMetric.style.height = height.toString() + "px";
+				 
+				var link = document.getElementById("link_" + metrics.category);
+				
+				contentMetric.insertBefore(metricsDescription,link);
+			
+			
+			}else
+			{
+		
+				content.innerHTML = "<p><b>"+ metrics.name +"</b></p><p> Count: " + metrics.value.count + "</p>" ;
+				content.innerHTML = content.innerHTML  + "<p> M1 Rate: " + metrics.value.m1_rate + "</p>" ;
+				content.innerHTML = content.innerHTML  + "<p> M5 Rate: " + metrics.value.m5_rate + "</p>" ;
+				content.innerHTML = content.innerHTML  + "<p> M15 Rate: " + metrics.value.m15_rate + "</p>" ;
+				content.innerHTML = content.innerHTML  + "<p> Mean Rate: " + metrics.value.mean_rate + "</p>" ;
+				
+				
+			}
+			
+		}
+		
+		if(metrics.type === "Gauge")
+		{
+			
+			if(content == null)
+			{
+			
+				var metricsDescription = document.createElement("span");
+				metricsDescription.setAttribute("id", metrics.id);
+				metricsDescription.setAttribute("class", "metricsValue");
+				metricsDescription.innerHTML = "<b>"+ metrics.name +"</b> " + metrics.value.value;
+				
+				var contentMetric = document.getElementById(metrics.type + "_" + metrics.category);
+				
+				var height = parseInt(contentMetric.clientHeight) + 12;
+				contentMetric.style.height = height.toString() + "px";
+				 
+				var link = document.getElementById("link_" + metrics.category);
+				
+				contentMetric.insertBefore(metricsDescription,link);
+			
+			
+			}else
+			{
+		
+				content.innerHTML = "<b>"+ metrics.name +"</b> " + metrics.value.value;
+				
+			}
+			
+		}
+		
+		var contentTime = document.getElementById("time_" + metrics.category);
+		contentTime.innerHTML = timeConverter(metrics.value.timeStamp);
+		
+	}
+	
+	function printMetricsElement(metrics) {
+		
+		var content = document.getElementById("content");
+		
+		var metricsDiv = document.createElement("div");
+		metricsDiv.setAttribute("id", metrics.type + "_" + metrics.category);
+		metricsDiv.setAttribute("class", "metrics " + metrics.type);
+		content.appendChild(metricsDiv);
+		
+		var metricsName = document.createElement("span");
+		metricsName.setAttribute("class", "metricsName");
+		metricsName.innerHTML = metrics.category + " (" + metrics.type + ")";
+		metricsDiv.appendChild(metricsName);
+		
+		if(metrics.type === "Counter")
+		{
+			var metricsDescription = document.createElement("span");
+			metricsDescription.setAttribute("id", metrics.id);
+			metricsDescription.setAttribute("class", "metricsValue");
+			metricsDescription.innerHTML = "<b>"+ metrics.name +"</b> " + metrics.value.count;
+			metricsDiv.appendChild(metricsDescription);
+						
+		}
+		
+		if(metrics.type === "Timer")
+		{
+			
+			var metricsDescription = document.createElement("span");
+			metricsDescription.setAttribute("id", metrics.id);
+			metricsDescription.setAttribute("class", "metricsValue");
+			metricsDescription.innerHTML = "<p><b>"+ metrics.name +"</b></p><p> Max: " + metrics.value.max + "</p>" ;
+			metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> Mean: " + metrics.value.mean + "</p>" ;
+			metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> Min: " + metrics.value.min + "</p>" ;
+			metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> Stddev: " + metrics.value.stddev + "</p>" ;
+			metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> P50: " + metrics.value.p50 + "</p>" ;
+			metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> P75: " + metrics.value.p75 + "</p>" ;
+			metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> P95: " + metrics.value.p95 + "</p>" ;
+			metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> P98: " + metrics.value.p98 + "</p>" ;
+			metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> P99: " + metrics.value.p99 + "</p>" ;
+			metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> P999: " + metrics.value.p999 + "</p>" ;
+		
+			metricsDiv.appendChild(metricsDescription);
+			
+		}
+		
+		if(metrics.type === "Meter")
+		{
+			
+			var metricsDescription = document.createElement("span");
+			metricsDescription.setAttribute("id", metrics.id);
+			metricsDescription.setAttribute("class", "metricsValue");
+			metricsDescription.innerHTML = "<p><b>"+ metrics.name +"</b></p><p> Count: " + metrics.value.count + "</p>" ;
+			metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> M1 Rate: " + metrics.value.m1_rate + "</p>" ;
+			metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> M5 Rate: " + metrics.value.m5_rate + "</p>" ;
+			metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> M15 Rate: " + metrics.value.m15_rate + "</p>" ;
+			metricsDescription.innerHTML = metricsDescription.innerHTML  + "<p> Mean Rate: " + metrics.value.mean_rate + "</p>" ;
+			
+			metricsDiv.appendChild(metricsDescription);
+			
+		}
+		
+		if(metrics.type === "Gauge")
+		{
+			
+			var metricsDescription = document.createElement("span");
+			metricsDescription.setAttribute("id", metrics.id);
+			metricsDescription.setAttribute("class", "metricsValue");
+			metricsDescription.innerHTML = "<b>"+ metrics.name +"</b> " + metrics.value.value;
+			metricsDiv.appendChild(metricsDescription);
+			
+		}
+
+		var removeMetrics = document.createElement("span");
+		removeMetrics.setAttribute("id", "link_" + metrics.category);
+		removeMetrics.setAttribute("class", "removeMetrics");
+		removeMetrics.innerHTML = "<a href=\"#\" OnClick=removeMetrics("
+				+ metrics.id + ")>Remove Metrics</a>";
+		metricsDiv.appendChild(removeMetrics);
+		
+		if(metrics.timeStamp != "")
+	    {
+			var metricsTime = document.createElement("span");
+			metricsTime.setAttribute("id", "time_" + metrics.category);
+			metricsTime.setAttribute("class", "metricsTimeStamp");
+			metricsTime.innerHTML = timeConverter(metrics.value.timeStamp);
+			metricsDiv.appendChild(metricsTime);
+	    }
+		
+	}
+
+	function updateMetricsAutomatically() {
+		hideForm();
+		updateAutomatically = true;
+		document.getElementById("add_metrics").style.display = "none";
+		document.getElementById("update_metrics").style.display = "none";
+		
+	}
+	
+	function showForm() {
+		document.getElementById("addMetricsForm").style.display = '';
+	}
+
+	function hideForm() {
+		document.getElementById("addMetricsForm").style.display = "none";
+	}
+
+	function formSubmit() {
+		var form = document.getElementById("addMetricsForm");
+		var category = form.elements["category"].value;
+		hideForm();
+		document.getElementById("addMetricsForm").reset();
+		addMetrics(category);
+	}
+
+	function init() {
+		hideForm();
+		starWebSocket();
+	}
+	
+	function timeConverter(UNIX_timestamp){
+		  var a = new Date(UNIX_timestamp * 1000);
+		  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+		  var year = a.getFullYear();
+		  var month = months[a.getMonth()];
+		  var date = a.getDate();
+		  var hour = a.getHours();
+		  var min = a.getMinutes();
+		  var sec = a.getSeconds();
+		  var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+		  return time;
+	}
+	
+</script>
+<style>
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 80%;
+	background-color: #1f1f1f;
+}
+
+#wrapper {
+	width: 960px;
+	margin: auto;
+	text-align: left;
+	color: #d9d9d9;
+}
+
+p {
+	text-align: left;
+}
+
+.button {
+	display: inline;
+	color: #fff;
+	background-color: #f2791d;
+	padding: 8px;
+	margin: auto;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	box-shadow: none;
+	border: none;
+	margin-left: 20px;
+}
+
+.button:hover {
+	background-color: #ffb15e;
+}
+
+.button a, a:visited, a:hover, a:active {
+	color: #fff;
+	text-decoration: none;
+}
+
+#addMetrics {
+	text-align: center;
+	width: 960px;
+	margin: auto;
+	margin-bottom: 10px;
+}
+
+#addMetricsForm {
+	text-align: left;
+	width: 400px;
+	margin: auto;
+	padding: 10px;
+}
+
+#addMetricsForm span {
+	display: block;
+}
+
+#content {
+	margin: auto;
+	width: 960px;
+}
+
+.metrics {
+	width: 180px;
+	height: auto;
+	margin: 10px;
+	padding: 16px;
+	color: #fff;
+	vertical-align: top;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	display: inline-block;
+}
+
+.metrics.off {
+	background-color: #c8cccf;
+}
+
+.metrics span {
+	display: block;
+}
+
+.metricsName {
+	text-align: center;
+	font-weight: bold;
+	margin-bottom: 14px;
+}
+
+.metricsValue {
+	text-align: center;
+	font-weight: bold;
+	margin-bottom: 12px;
+}
+
+.metricsTimeStamp {
+	text-align: center;
+	font-weight: bold;
+	margin-bottom: 6px;
+	margin-top: 15px;
+}
+
+.removeMetrics {
+	margin-top: 25px;
+	text-align: center;
+}
+
+.metrics.Counter {
+	background-color: #5eb85e;
+}
+
+.metrics.Counter a:hover {
+	color: #a1ed82;
+}
+
+.metrics.Timer {
+	background-color: #0f90d1;
+}
+
+.metrics.Timer a:hover {
+	color: #4badd1;
+}
+
+.metrics.Gauge {
+	background-color: #ffbf00;
+}
+
+.metrics.Gauge a:hover {
+	color: #f2b90d;
+}
+
+.metrics.Meter {
+	background-color: #00bfff;
+}
+
+.metrics.Meter a:hover {
+	color: #19b3e6;
+}
+
+
+.metrics.Histogram {
+	background-color: #0f90d1;
+}
+
+.metrics.Histogram a:hover {
+	color: #4badd1;
+}
+
+.metrics.General {
+	background-color: #0f90d1;
+}
+
+.metrics.General a:hover {
+	color: #4badd1;
+}
+
+.metrics a {
+	text-decoration: none;
+}
+
+.metrics a:visited, a:active, a:hover {
+	color: #fff;
+}
+
+.metrics a:hover {
+	text-decoration: underline;
+}
+</style>
+</head>
+<body>
+	<div id="wrapper">
+		<h1>Metrics Dashboard</h1>
+		<p>Welcome to Metrics Dashboard Home. Click the Add Metrics or Update Metrics Automatically
+			buttons to start adding metrics.</p>
+		<br />
+		<div id="addMetrics">
+			<div id="add_metrics" class="button">
+				<a  href="#" OnClick="showForm()">Add Metrics</a>				
+			</div>
+			<div id="update_metrics"  class="button">
+				<a href="#" OnClick="updateMetricsAutomatically()">Update Metrics Automatically</a>
+			</div>
+			<form id="addMetricsForm">
+				<h3>Add a new Metrics</h3>
+				<span>Category: <input type="text" name="category"
+					id="metrics_category"></span> 
+			    <input type="button" class="button" value="Add"
+					onclick=formSubmit()> <input type="reset" class="button"
+					value="Cancel" onclick=hideForm()>
+			</form>
+		</div>
+		<br />
+		<div id="status">Connecting...</div>
+		<h3>Metrics:</h3>
+		<div id="content"></div>
+	</div>
+</body>
+</html>
