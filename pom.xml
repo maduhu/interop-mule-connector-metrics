@@ -3,7 +3,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>interop-mule-connector-metrics</artifactId>
-	<version>1.0.3-SNAPSHOT</version>
+	<version>1.0.4-SNAPSHOT</version>
 	<packaging>mule-module</packaging>
 	<name>Mule Metrics Anypoint Connector</name>
 
