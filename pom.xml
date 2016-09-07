@@ -2,11 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.l1p.interop</groupId>
 	<artifactId>interop-mule-connector-metrics</artifactId>
 	<version>1.0.1-SNAPSHOT</version>
 	<packaging>mule-module</packaging>
 	<name>Mule Metrics Anypoint Connector</name>
+
+	<!--<parent>-->
+		<!--<groupId>com.l1p.interop</groupId>-->
+		<!--<artifactId>interop-parent</artifactId>-->
+		<!--<version>1.0.2</version>-->
+	<!--</parent>-->
 
 	<parent>
 		<groupId>org.mule.tools.devkit</groupId>
@@ -18,20 +23,14 @@
 		<licensePath>LICENSE.md</licensePath>
 		<devkit.studio.package.skip>false</devkit.studio.package.skip>
 		<tyrus.version>1.1</tyrus.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-		<mule.version>3.8.0</mule.version>
-		<mule.tools.version>1.2</mule.tools.version>
-		<munit.version>1.2.0</munit.version>
-		<mule.munit.support.version>3.8.0</mule.munit.support.version>
-		<apikit.version>3.8.0</apikit.version>
-		<project.scm.id>git</project.scm.id>
 	</properties>
 
 	<scm>
 		<connection>scm:git:https://github.com/LevelOneProject/interop-mule-connector-metrics</connection>
+		<!--<developerConnection>scm:git:https://github.com/LevelOneProject/interop-mule-connector-metrics</developerConnection>-->
+		<url>http://github.com/LevelOneProject/interop-mule-connector-metrics</url>
 		<tag>HEAD</tag>
+		<!--<developerConnection>scm:git:git@github.com:mulesoft/mule-devkit-parent.git</developerConnection>-->
 	</scm>
 	
 	<distributionManagement>
@@ -46,99 +45,6 @@
 			<url>https://modusbox.jfrog.io/modusbox/libs-snapshot-local</url>
 		</snapshotRepository>
 	</distributionManagement>
-	
-	<build>
-		<plugins>
-			<!--
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-install-plugin</artifactId>
-				<version>2.5.2</version>
-			</plugin>
-			-->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
-			</plugin>
-			<plugin>
-				<groupId>org.mule.tools.maven</groupId>
-				<artifactId>mule-app-maven-plugin</artifactId>
-				<version>${mule.tools.version}</version>
-				<extensions>true</extensions>
-				<configuration>
-					<copyToAppsDirectory>false</copyToAppsDirectory>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.1</version>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>project</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<id>add-resource</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>add-resource</goal>
-						</goals>
-						<configuration>
-							<resources>
-								<resource>
-									<directory>src/main/app/</directory>
-								</resource>
-								<resource>
-									<directory>src/main/resources/</directory>
-								</resource>
-								<resource>
-									<directory>src/main/api/</directory>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>com.mulesoft.munit.tools</groupId>
-				<artifactId>munit-maven-plugin</artifactId>
-				<version>${munit.version}</version>
-				<executions>
-					<execution>
-						<id>test</id>
-						<phase>test</phase>
-						<goals>
-							<goal>test</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<coverage>
-						<runCoverage>true</runCoverage>
-						<formats>
-							<format>html</format>
-						</formats>
-					</coverage>
-				</configuration>
-			</plugin>
-		</plugins>
-		<testResources>
-			<testResource>
-				<directory>src/test/munit</directory>
-			</testResource>
-			<testResource>
-				<directory>src/test/resources</directory>
-			</testResource>
-		</testResources>
-	</build>
-	
 	
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/io.dropwizard.metrics/metrics-core -->
