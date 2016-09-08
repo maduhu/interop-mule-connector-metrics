@@ -19,6 +19,7 @@
 		<licensePath>LICENSE.md</licensePath>
 		<devkit.studio.package.skip>false</devkit.studio.package.skip>
 		<project.scm.id>git</project.scm.id>
+		<maven.javadoc.skip>true</maven.javadoc.skip>
 	</properties>
 
 	<scm>
