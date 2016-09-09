@@ -15,8 +15,6 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
     <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
     <spring:beans>
-     <spring:bean id="QueueSize" scope="singleton" class="metricsdemo.MyBean">
-        </spring:bean> 
          <spring:bean id="metricRegistry" scope="singleton" class="com.codahale.metrics.MetricRegistry">
         </spring:bean>
         <spring:bean id="consoleReporter" class="com.l1p.interop.mule.connector.metrics.spring.ReporterFactory" factory-method="createConsoleReporter">
@@ -30,24 +28,15 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
             <spring:ref bean="slf4jReporter" />
        </util:list>
     </spring:beans>
-    <metrics:config name="Metrics__Configuration" metricRegistry-ref="metricRegistry" reporterInterval="20" doc:name="Metrics: Metric Connector Configuration" host="localhost" port="8025" serverembedded="true" servicename="websockets">
+    <metrics:config name="Metrics__Configuration" metricRegistry-ref="metricRegistry" reporterInterval="20" doc:name="Metrics: Metric Connector Configuration">
        <metrics:scheduled-reporters ref="scheduledReporters" />
    </metrics:config>
     <vm:connector name="VM" validateConnections="true" doc:name="VM">
         <vm:queue-profile maxOutstandingMessages="20">
             <default-in-memory-queue-store/>
-
         </vm:queue-profile>
     </vm:connector>
-    <flow name="customDashboard">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP"/>
-        <parse-template location="custom_dashboard.html" doc:name="Parse Template"/>
-        <set-property propertyName="Content-Type" value="text/html" doc:name="Property"/>
-    </flow>
-    <flow name="dashboard">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="/dashboard" doc:name="HTTP"/>
-        <metrics:dashboard-builder config-ref="Metrics__Configuration" doc:name="Metrics"/>
-    </flow>  
+  
      <flow name="metricsdemoFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/demo" doc:name="HTTP"/>
         <logger message="Begin Demo" level="INFO" doc:name="Logger"/>
@@ -58,12 +47,11 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
                 <metrics:metric-key>Counter2</metrics:metric-key>
             </metrics:metric-keys>
         </metrics:inc-count>
-        <metrics:add-gauge config-ref="Metrics__Configuration" doc:name="Gauge"/>
-        <set-variable variableName="ex" value="#[[60000, 20000, 30000, 30000, 40000, 45000, 46000, 47000, 48000, 49000, 50000, 60000, 70000, 80000, 50000]]" doc:name="Set Sleeps time" />
+<!--         <set-variable variableName="ex" value="#[[60000, 20000, 30000, 30000, 40000, 45000, 46000, 47000, 48000, 49000, 50000, 60000, 70000, 80000, 50000]]" doc:name="Set Sleeps time" />
          <foreach collection="#[ex]" doc:name="Foreach">
             <vm:outbound-endpoint exchange-pattern="one-way" path="process.demo" connector-ref="VM" doc:name="VM"/>
          </foreach>
-
+ -->
         <expression-component doc:name="Sleep 10s"><![CDATA[Thread.sleep(10000);]]></expression-component>
         <metrics:inc-count config-ref="Metrics__Configuration" category="CounterCategory" doc:name="Counter 2">
             <metrics:metric-keys>
@@ -83,11 +71,6 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
     <flow name="metricsdemoFlow1" processingStrategy="synchronous">
         <vm:inbound-endpoint exchange-pattern="one-way" path="process.demo" connector-ref="VM" doc:name="VM" mimeType="application/x-compressed"/>
         <logger message="Processing sleep: #[Integer.toString(payload)]" level="INFO" doc:name="Logger"/>
-        <metrics:meter config-ref="Metrics__Configuration" category="MeterCategory01" doc:name="Meter">
-            <metrics:meter-keys>
-                <metrics:meter-key>Meter01</metrics:meter-key>
-            </metrics:meter-keys>
-        </metrics:meter>
          <expression-component doc:name="Expression"><![CDATA[Thread.sleep(payload);]]></expression-component>
         <logger message="Sleep processed" level="INFO" doc:name="Logger"/>
     </flow>

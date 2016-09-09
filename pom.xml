@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.l1p.interop</groupId>
 	<artifactId>interop-mule-connector-metrics</artifactId>
-	<version>1.0.13-SNAPSHOT</version>
+	<version>1.0.14-SNAPSHOT</version>
 	<packaging>mule-module</packaging>
 	<name>Mule Metrics Anypoint Connector</name>
 
