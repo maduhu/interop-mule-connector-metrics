@@ -3,6 +3,8 @@ package com.l1p.interop.mule.connector.metrics.spring;
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
+import com.l1p.interop.mule.connector.metrics.reporter.KafkaReporter;
+import com.l1p.interop.mule.connector.metrics.reporter.MetricKafkaProducer;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
@@ -30,6 +32,13 @@ public class ReporterFactory {
   public static Slf4jReporter createSlf4jReporter(MetricRegistry metricRegistry) {
     return Slf4jReporter.forRegistry(metricRegistry)
         .outputTo(LoggerFactory.getLogger("com.example.metrics"))
+        .convertRatesTo(TimeUnit.SECONDS)
+        .convertDurationsTo(TimeUnit.MILLISECONDS)
+        .build();
+  }
+
+  public static final KafkaReporter createKafkaReporter(MetricRegistry metricRegistry, String globalPrefix, MetricKafkaProducer producer, String env, String app) {
+    return KafkaReporter.forRegistry(metricRegistry, globalPrefix, producer, env, app)
         .convertRatesTo(TimeUnit.SECONDS)
         .convertDurationsTo(TimeUnit.MILLISECONDS)
         .build();
