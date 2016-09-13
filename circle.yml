@@ -25,7 +25,7 @@ deployment:
       
       #Merge back to develop so the latest version is shared
       - git remote set-url origin https://$GITHUB_TOKEN@github.com/LevelOneProject/interop-mule-connector-metrics.git
-      - git checkout -b develop origin/develop
+      - git checkout -B develop origin/develop
       - git pull origin develop
       - git merge master
       - git push origin develop
