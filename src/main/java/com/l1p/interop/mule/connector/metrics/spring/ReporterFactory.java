@@ -37,8 +37,8 @@ public class ReporterFactory {
         .build();
   }
 
-  public static final KafkaReporter createKafkaReporter(MetricRegistry metricRegistry, String globalPrefix, MetricKafkaProducer producer, String env, String app) {
-    return KafkaReporter.forRegistry(metricRegistry, globalPrefix, producer, env, app)
+  public static final KafkaReporter createKafkaReporter(MetricRegistry metricRegistry, String kafkaTopic, MetricKafkaProducer producer, String env, String app) {
+    return KafkaReporter.forRegistry(metricRegistry, kafkaTopic, producer, env, app)
         .convertRatesTo(TimeUnit.SECONDS)
         .convertDurationsTo(TimeUnit.MILLISECONDS)
         .build();

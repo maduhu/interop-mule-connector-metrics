@@ -62,7 +62,7 @@ public class KafkaReporter extends ScheduledReporter {
                      SortedMap<String, Histogram> histograms,
                      SortedMap<String, Meter> meters,
                      SortedMap<String, Timer> timers) {
-    final long timestamp = TimeUnit.MILLISECONDS.toSeconds(clock.getTime());
+    final long timestamp = clock.getTime();
 
     for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
       reportGauge(timestamp, entry.getKey(), entry.getValue());
@@ -155,7 +155,8 @@ public class KafkaReporter extends ScheduledReporter {
   private void report(long timestamp, String name, MetricType metricType, String line, Object... values) {
     final Formatter formatter = new Formatter(locale);
     final String metric = formatter.format(String.format(locale, "%s,%s,%s,%s,%d,%s", metricType, env, app, name, timestamp, line), values).toString();
-    metricKafkaProducer.send(kafkaTopic, name, metric);
+    final String metricKey = MetricRegistry.name(env, app, name);
+    metricKafkaProducer.send(kafkaTopic, metricKey, metric);
 
   }
 
