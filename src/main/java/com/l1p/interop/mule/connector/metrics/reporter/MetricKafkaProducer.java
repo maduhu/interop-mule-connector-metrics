@@ -45,7 +45,6 @@ public class MetricKafkaProducer {
    * @param values
    */
   public void send(String topic, String metricKey, String values) {
-    System.out.println("sending " + values);
     kafkaProducer.send(new ProducerRecord<>(topic, metricKey, values));
   }
 
