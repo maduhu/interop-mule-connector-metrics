@@ -18,9 +18,9 @@ import static com.l1p.interop.mule.connector.metrics.reporter.MetricType.*;
  */
 public class KafkaReporter extends ScheduledReporter {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(KafkaReporter.class);
-  private static final Charset UTF_8 = Charset.forName("UTF-8");
+  private static final Logger logger = LoggerFactory.getLogger(KafkaReporter.class);
   private final String kafkaTopic;
+  private final MetricRegistry registry;
   private final Locale locale;
   private final Clock clock;
   private final MetricKafkaProducer metricKafkaProducer;
@@ -38,6 +38,7 @@ public class KafkaReporter extends ScheduledReporter {
                         String env,
                         String app) {
     super(registry, "kafka-reporter", filter, rateUnit, durationUnit);
+    this.registry = registry;
     this.locale = locale;
     this.clock = clock;
     this.kafkaTopic = kafkaTopic;
@@ -62,26 +63,36 @@ public class KafkaReporter extends ScheduledReporter {
                      SortedMap<String, Histogram> histograms,
                      SortedMap<String, Meter> meters,
                      SortedMap<String, Timer> timers) {
-    final long timestamp = TimeUnit.MILLISECONDS.toSeconds(clock.getTime());
 
-    for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
-      reportGauge(timestamp, entry.getKey(), entry.getValue());
-    }
+    Timer.Context reportDuration = null;
+    try {
+      logger.info("begin report");
+      final Timer timer = registry.timer("reporter.kakfka.report.duration");
+      reportDuration = timer.time();
+      final long timestamp = clock.getTime();
 
-    for (Map.Entry<String, Counter> entry : counters.entrySet()) {
-      reportCounter(timestamp, entry.getKey(), entry.getValue());
-    }
+      for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
+        reportGauge(timestamp, entry.getKey(), entry.getValue());
+      }
 
-    for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
-      reportHistogram(timestamp, entry.getKey(), entry.getValue());
-    }
+      for (Map.Entry<String, Counter> entry : counters.entrySet()) {
+        reportCounter(timestamp, entry.getKey(), entry.getValue());
+      }
 
-    for (Map.Entry<String, Meter> entry : meters.entrySet()) {
-      reportMeter(timestamp, entry.getKey(), entry.getValue());
-    }
+      for (Map.Entry<String, Histogram> entry : histograms.entrySet()) {
+        reportHistogram(timestamp, entry.getKey(), entry.getValue());
+      }
 
-    for (Map.Entry<String, Timer> entry : timers.entrySet()) {
-      reportTimer(timestamp, entry.getKey(), entry.getValue());
+      for (Map.Entry<String, Meter> entry : meters.entrySet()) {
+        reportMeter(timestamp, entry.getKey(), entry.getValue());
+      }
+
+      for (Map.Entry<String, Timer> entry : timers.entrySet()) {
+        reportTimer(timestamp, entry.getKey(), entry.getValue());
+      }
+      logger.info("end report");
+    } finally {
+      if (reportDuration != null) reportDuration.stop();
     }
   }
 
@@ -155,7 +166,8 @@ public class KafkaReporter extends ScheduledReporter {
   private void report(long timestamp, String name, MetricType metricType, String line, Object... values) {
     final Formatter formatter = new Formatter(locale);
     final String metric = formatter.format(String.format(locale, "%s,%s,%s,%s,%d,%s", metricType, env, app, name, timestamp, line), values).toString();
-    metricKafkaProducer.send(kafkaTopic, name, metric);
+    final String metricKey = MetricRegistry.name(env, app, name);
+    metricKafkaProducer.send(kafkaTopic, metricKey, metric);
 
   }
 
