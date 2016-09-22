@@ -1,9 +1,6 @@
 package com.l1p.interop.mule.connector.metrics.automation.functional;
 
-import com.codahale.metrics.ConsoleReporter;
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Timer;
+import com.codahale.metrics.*;
 import com.l1p.interop.mule.connector.metrics.reporter.KafkaReporter;
 import com.l1p.interop.mule.connector.metrics.reporter.MetricKafkaProducer;
 import com.l1p.interop.mule.connector.metrics.spring.ReporterFactory;
@@ -17,7 +14,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @Ignore
 public class KafkaReporterFunctionalTest {
 
-  private String kafkaTopic = "test";
+  private String kafkaTopic = "bmgf.metric.20160921";
   private String kafkaServer = "ec2-52-26-168-223.us-west-2.compute.amazonaws.com:9092";
 
   @Test
@@ -28,8 +25,10 @@ public class KafkaReporterFunctionalTest {
     final ConsoleReporter consoleReporter = ReporterFactory.createConsoleReporter(metricRegistry);
     consoleReporter.start(3, SECONDS);
 
-    final Counter counter = metricRegistry.counter("my.counter");
-    final Timer timer = metricRegistry.timer("my.timer");
+    final Counter counter = metricRegistry.counter("my.counter.0922");
+    final Timer timer = metricRegistry.timer("my.timer.0922");
+//    final Meter something = metricRegistry.meter("something");
+//    something.mark();
     final Random random = new Random(System.currentTimeMillis());
 
     for (int i = 0; i < 10; i++) {
