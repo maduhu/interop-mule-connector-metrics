@@ -248,6 +248,7 @@ public class KVPMetricsReporter extends ScheduledReporter {
             }
         }
 
+        lastTimestamp = timestamp;
         timerCounts.put( name, totalCount );
         loggerProxy.log(marker,
                 "type=TIMER, category={}, elapsed={}, count={}, totalCount={}, rate={}, m1={}, min={}, max={}, mean={}, " +
