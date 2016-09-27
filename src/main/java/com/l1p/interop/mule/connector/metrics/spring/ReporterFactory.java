@@ -46,11 +46,11 @@ public class ReporterFactory {
         .build();
   }
 
-  public static final CsvMetricsReporter createCsvMetricReporter(MetricRegistry metricRegistry, String csvTopic, String directory, String env, String app) {
+  public static final CsvMetricsReporter createCsvMetricReporter(MetricRegistry metricRegistry, String csvTopic, File directory, String env, String app) {
     return CsvMetricsReporter.forRegistry(metricRegistry, csvTopic, directory, env, app)
             .convertRatesTo(TimeUnit.SECONDS)
             .convertDurationsTo(TimeUnit.MILLISECONDS)
-            .build(new File(directory) );
+            .build( directory );
   }
 
 }

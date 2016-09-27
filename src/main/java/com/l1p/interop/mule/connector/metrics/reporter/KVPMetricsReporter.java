@@ -204,7 +204,7 @@ public class KVPMetricsReporter extends ScheduledReporter {
     }
 
     /**
-     * Hack to only report data when values have changed
+     * Method to only report data when values have changed
      *
      * @param timers
      * @return

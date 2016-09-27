@@ -30,7 +30,7 @@ public class CsvReporterFunctionalTest {
     File testPath = new File(directory);
     //create directory under current project - not currently checking if this fails
     testPath.mkdir();
-    final CsvMetricsReporter csvMetricReporter = ReporterFactory.createCsvMetricReporter(metricRegistry, csvTopic, directory, "ft-env", "ft-app");
+    final CsvMetricsReporter csvMetricReporter = ReporterFactory.createCsvMetricReporter(metricRegistry, csvTopic, testPath, "ft-env", "ft-app");
 
     csvMetricReporter.start(3, SECONDS);
     consoleReporter.start(3, SECONDS);
@@ -39,8 +39,8 @@ public class CsvReporterFunctionalTest {
     final Timer timer = metricRegistry.timer("metrics-timer-test-926");
     final Random random = new Random(System.currentTimeMillis());
 
-    for (int i = 0; i < 5; i++) {
-      counter.inc(random.nextInt(10));
+    for (int i = 0; i < 10; i++) {
+      //counter.inc(random.nextInt(10));
       final Timer.Context time = timer.time();
       Thread.sleep(random.nextInt(50));
       time.stop();

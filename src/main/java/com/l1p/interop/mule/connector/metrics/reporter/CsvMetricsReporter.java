@@ -26,8 +26,11 @@ public class CsvMetricsReporter extends ScheduledReporter {
     private final Map<String, Long> timerCounts = new HashMap<String, Long>();
     long lastTimestamp = 0;
     long lastTimestampForCount = 0;
+    private final int intervalLimit = 5;
+    int idleCount = 0;
+    int idleTimer = 0;
 
-    public static CsvMetricsReporter.Builder forRegistry(MetricRegistry registry, String csvTopic, String directory, String env, String app) {
+    public static CsvMetricsReporter.Builder forRegistry(MetricRegistry registry, String csvTopic, File directory, String env, String app) {
         return new CsvMetricsReporter.Builder(registry, csvTopic, directory, env, app);
     }
 
@@ -40,7 +43,7 @@ public class CsvMetricsReporter extends ScheduledReporter {
 
     public void report(SortedMap<String, Gauge> gauges, SortedMap<String, Counter> counters, SortedMap<String, Histogram> histograms, SortedMap<String, Meter> meters, SortedMap<String, Timer> timers) {
         long timestamp = TimeUnit.MILLISECONDS.toSeconds(this.clock.getTime());
-        Iterator var8 = gauges.entrySet().iterator();
+        Iterator var8 = counters.entrySet().iterator();
 
         Entry entry;
         /*
@@ -50,7 +53,7 @@ public class CsvMetricsReporter extends ScheduledReporter {
         }
         */
 
-        var8 = counters.entrySet().iterator();
+        int counter = 0;
         if ( valueChanged( counters.entrySet() ) ) {
             while(var8.hasNext()) {
                 entry = (Entry)var8.next();
@@ -83,7 +86,7 @@ public class CsvMetricsReporter extends ScheduledReporter {
     }
 
     /**
-     * Hack to only report data when counter values have changed
+     * Method to only report data when counter values have changed
      *
      * @param counters
      * @return
@@ -94,7 +97,8 @@ public class CsvMetricsReporter extends ScheduledReporter {
             String name = entry.getKey();
             Counter nextCounter = entry.getValue();
             Long lastSample = timerCounts.get( name );
-            if ( lastSample == null || ( lastSample.compareTo( nextCounter.getCount() ) != 0 ) ) {
+
+            if ( lastSample == null || ( lastSample.compareTo( nextCounter.getCount() ) != 0 ) )  {
                 return true;
             }
         }
@@ -103,16 +107,16 @@ public class CsvMetricsReporter extends ScheduledReporter {
     }
 
     /**
-     * Hack to only report data when timer values have changed
+     * Method to only report data when timer values have changed
      *
      * @param timers
      * @return
      */
     private boolean timerValueChanged( Set<Entry<String, Timer>> timers ) {
-
         for (Entry<String, Timer> entry : timers) {
             String name = entry.getKey();
             Timer nextTimer = entry.getValue();
+
             Long lastSample = timerCounts.get( name );
             if ( lastSample == null || ( lastSample.compareTo( nextTimer.getCount() ) != 0 ) ) {
                 return true;
@@ -193,7 +197,6 @@ public class CsvMetricsReporter extends ScheduledReporter {
         }
         timerCounts.put( name, totalCount );
         lastTimestampForCount = timestamp;
-        //currentCount = totalCount;
 
         this.report(elapsed, name, "count", "%d", new Object[]{Long.valueOf(count)});
         //this.report(timestamp, name, "count", "%d", new Object[]{Long.valueOf(counter.getCount())});
@@ -241,9 +244,9 @@ public class CsvMetricsReporter extends ScheduledReporter {
         private Clock clock;
         private MetricFilter filter;
         private String csvTopic;
-        private String directory;
+        private File directory;
 
-        private Builder(MetricRegistry registry, String csvTopic, String directory, String env, String app) {
+        private Builder(MetricRegistry registry, String csvTopic, File directory, String env, String app) {
             this.registry = registry;
             this.env = env;
             this.app = app;
@@ -282,7 +285,7 @@ public class CsvMetricsReporter extends ScheduledReporter {
         }
 
         public CsvMetricsReporter build(File directory) {
-            return new CsvMetricsReporter(this.registry, directory, this.locale, this.rateUnit, this.durationUnit, this.clock, this.filter);
+            return new CsvMetricsReporter(this.registry, this.directory, this.locale, this.rateUnit, this.durationUnit, this.clock, this.filter);
         }
     }
 
