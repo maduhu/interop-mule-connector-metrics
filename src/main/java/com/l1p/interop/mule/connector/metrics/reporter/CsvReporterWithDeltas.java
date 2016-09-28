@@ -22,6 +22,7 @@ public class CsvReporterWithDeltas extends ScheduledReporter {
     private final File directory;
     private final Locale locale;
     private final Clock clock;
+    private final MetricRegistry registry;
 
     private final Map<String, Long> timerCounts = new HashMap<String, Long>();
     long lastTimestamp = 0;
@@ -38,6 +39,7 @@ public class CsvReporterWithDeltas extends ScheduledReporter {
         this.directory = directory;
         this.locale = locale;
         this.clock = clock;
+        this.registry = registry;
     }
 
     public void report(SortedMap<String, Gauge> gauges, SortedMap<String, Counter> counters, SortedMap<String, Histogram> histograms, SortedMap<String, Meter> meters, SortedMap<String, Timer> timers) {
@@ -45,22 +47,33 @@ public class CsvReporterWithDeltas extends ScheduledReporter {
         Iterator var8 = counters.entrySet().iterator();
         Entry entry;
 
-        if ( valueChanged( counters.entrySet() ) ) {
-            while(var8.hasNext()) {
-                entry = (Entry)var8.next();
-                this.reportCounter(timestamp, (String)entry.getKey(), (Counter)entry.getValue());
-            }
-        }
+        Timer.Context reportDuration = null;
+        try {
+            LOGGER.info("begin csv reporting");
+            final Timer timer = registry.timer("metrics-csv-reporting-timer");
+            final Counter counter = registry.counter("metrics-csv-reporting-counter");
+            reportDuration = timer.time();
 
-        var8 = timers.entrySet().iterator();
-        if ( timerValueChanged( timers.entrySet() ) ) {
-            while(var8.hasNext()) {
-                entry = (Entry)var8.next();
-                this.reportTimer(timestamp, (String)entry.getKey(), (Timer)entry.getValue());
+            if ( valueChanged( counters.entrySet() ) ) {
+                while(var8.hasNext()) {
+                    entry = (Entry)var8.next();
+                    this.reportCounter(timestamp, (String)entry.getKey(), (Counter)entry.getValue());
+                }
             }
-        }
 
-        lastTimestamp = timestamp;
+            var8 = timers.entrySet().iterator();
+            if ( timerValueChanged( timers.entrySet() ) ) {
+                while(var8.hasNext()) {
+                    entry = (Entry)var8.next();
+                    this.reportTimer(timestamp, (String)entry.getKey(), (Timer)entry.getValue());
+                }
+            }
+
+            lastTimestamp = timestamp;
+            LOGGER.info("end csv reporting");
+        } finally {
+            if (reportDuration != null) reportDuration.stop();
+        }
     }
 
     /**
@@ -108,29 +121,29 @@ public class CsvReporterWithDeltas extends ScheduledReporter {
          Snapshot snapshot = timer.getSnapshot();
 
          Long totalCount = timer.getCount();
-         double rate = 0.0d;
-         long count = 0;
-         long elapsed = 0;
+         double intervalRate = 0.0d;
+         long delta = 0;
+         long interval = 0;
 
          if ( lastTimestamp > 0 ) {
-             elapsed = timestamp - lastTimestamp;
+             interval = timestamp - lastTimestamp;
              Long lastSample = timerCounts.get( name );
 
-             if ( elapsed > 0 && lastSample != null ) {
-                 count = ( totalCount - lastSample );
-                 rate = (count * 60) / (double)elapsed;
+             if ( interval > 0 && lastSample != null ) {
+                 delta = ( totalCount - lastSample );
+                 intervalRate = delta  / (double)interval;
              }
          }
 
          timerCounts.put( name, totalCount );
 
          this.report(timestamp, name,
-         "totalCount,interval,delta,currentRate,min,max,mean,rate_unit,duration_unit",
+         "total_count,interval,delta,interval_rate,min,max,mean,rate_unit,duration_unit",
          "%d,%d,%d,%f,%f,%f,%f,calls/%s,%s",
          timer.getCount(),
-         elapsed,
-         count,
-         rate,
+         interval,
+         delta,
+         intervalRate,
          convertDuration(snapshot.getMin()),
          convertDuration(snapshot.getMax()),
          convertDuration(snapshot.getMean()),
@@ -154,7 +167,7 @@ public class CsvReporterWithDeltas extends ScheduledReporter {
         }
         timerCounts.put( name, totalCount );
 
-        this.report(timestamp, name, "totalCount,interval,delta", "%d,%d,%d",
+        this.report(timestamp, name, "total_count,interval,delta", "%d,%d,%d",
                 new Object[]{ Long.valueOf( totalCount ), Long.valueOf( elapsed), Long.valueOf( currentCount ) }  );
 
     }
@@ -237,6 +250,8 @@ public class CsvReporterWithDeltas extends ScheduledReporter {
         }
 
         public CsvReporterWithDeltas build(File directory) {
+            //create directory under current project - not currently checking if this fails
+            directory.mkdir();
             return new CsvReporterWithDeltas(this.registry, this.directory, this.locale, this.rateUnit, this.durationUnit, this.clock, this.filter);
         }
     }

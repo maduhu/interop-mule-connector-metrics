@@ -27,9 +27,6 @@ public class CsvReporterFunctionalTest {
     final MetricRegistry metricRegistry = new MetricRegistry();
     final ConsoleReporter consoleReporter = ReporterFactory.createConsoleReporter(metricRegistry);
 
-    File testPath = new File(directory);
-    //create directory under current project - not currently checking if this fails
-    testPath.mkdir();
     final CsvReporterWithDeltas csvMetricReporter = ReporterFactory.createCsvReporterWithDeltas(metricRegistry, csvTopic, directory, "ft-env", "ft-app");
 
     csvMetricReporter.start(3, SECONDS);
