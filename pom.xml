@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.l1p.interop</groupId>
   <artifactId>interop-mule-connector-metrics</artifactId>
-  <version>1.0.18-SNAPSHOT</version>
+  <version>1.0.18</version>
   <packaging>mule-module</packaging>
   <name>Mule Metrics Anypoint Connector</name>
 
@@ -28,7 +28,7 @@
     <developerConnection>scm:git:https://github.com/LevelOneProject/interop-mule-connector-metrics.git
     </developerConnection>
     <url>https://github.com/LevelOneProject/interop-mule-connector-metrics</url>
-    <tag>HEAD</tag>
+    <tag>interop-mule-connector-metrics-1.0.18</tag>
   </scm>
 
   <distributionManagement>
