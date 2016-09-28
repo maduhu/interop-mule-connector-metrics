@@ -3,7 +3,7 @@ package com.l1p.interop.mule.connector.metrics.spring;
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
-import com.l1p.interop.mule.connector.metrics.reporter.CsvMetricsReporter;
+import com.l1p.interop.mule.connector.metrics.reporter.CsvReporterWithDeltas;
 import com.l1p.interop.mule.connector.metrics.reporter.KafkaReporter;
 import com.l1p.interop.mule.connector.metrics.reporter.MetricKafkaProducer;
 import org.slf4j.LoggerFactory;
@@ -46,11 +46,11 @@ public class ReporterFactory {
         .build();
   }
 
-  public static final CsvMetricsReporter createCsvMetricReporter(MetricRegistry metricRegistry, String csvTopic, File directory, String env, String app) {
-    return CsvMetricsReporter.forRegistry(metricRegistry, csvTopic, directory, env, app)
+  public static final CsvReporterWithDeltas createCsvReporterWithDeltas(MetricRegistry metricRegistry, String csvTopic, String directory, String env, String app) {
+    return CsvReporterWithDeltas.forRegistry(metricRegistry, csvTopic, new File( directory ), env, app)
             .convertRatesTo(TimeUnit.SECONDS)
             .convertDurationsTo(TimeUnit.MILLISECONDS)
-            .build( directory );
+            .build( new File( directory ) );
   }
 
 }
