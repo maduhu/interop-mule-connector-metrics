@@ -30,8 +30,8 @@ public class CsvReporterWithDeltas extends ScheduledReporter {
     //int idleCount = 0;
     //int idleTimer = 0;
 
-    public static CsvReporterWithDeltas.Builder forRegistry(MetricRegistry registry, String csvTopic, File directory, String env, String app) {
-        return new CsvReporterWithDeltas.Builder(registry, csvTopic, directory, env, app);
+    public static CsvReporterWithDeltas.Builder forRegistry(MetricRegistry registry, File directory, String env, String app) {
+        return new CsvReporterWithDeltas.Builder(registry, directory, env, app);
     }
 
     private CsvReporterWithDeltas(MetricRegistry registry, File directory, Locale locale, TimeUnit rateUnit, TimeUnit durationUnit, Clock clock, MetricFilter filter) {
@@ -54,7 +54,7 @@ public class CsvReporterWithDeltas extends ScheduledReporter {
             final Counter counter = registry.counter("metrics-csv-reporting-counter");
             reportDuration = timer.time();
 
-            if ( valueChanged( counters.entrySet() ) ) {
+            if ( counterValueChanged( counters.entrySet() ) ) {
                 while(var8.hasNext()) {
                     entry = (Entry)var8.next();
                     this.reportCounter(timestamp, (String)entry.getKey(), (Counter)entry.getValue());
@@ -82,7 +82,7 @@ public class CsvReporterWithDeltas extends ScheduledReporter {
      * @param counters
      * @return
      */
-    private boolean valueChanged( Set<Entry<String, Counter>> counters ) {
+    private boolean counterValueChanged( Set<Entry<String, Counter>> counters ) {
 
         for (Entry<String, Counter> entry : counters) {
             String name = entry.getKey();
@@ -208,10 +208,9 @@ public class CsvReporterWithDeltas extends ScheduledReporter {
         private TimeUnit durationUnit;
         private Clock clock;
         private MetricFilter filter;
-        private String csvTopic;
         private File directory;
 
-        private Builder(MetricRegistry registry, String csvTopic, File directory, String env, String app) {
+        private Builder(MetricRegistry registry, File directory, String env, String app) {
             this.registry = registry;
             this.env = env;
             this.app = app;
@@ -220,7 +219,6 @@ public class CsvReporterWithDeltas extends ScheduledReporter {
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.clock = Clock.defaultClock();
             this.filter = MetricFilter.ALL;
-            this.csvTopic = csvTopic;
             this.directory = directory;
         }
 

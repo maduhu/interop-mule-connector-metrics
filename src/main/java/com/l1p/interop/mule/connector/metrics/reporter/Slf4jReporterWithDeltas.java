@@ -1,32 +1,35 @@
 package com.l1p.interop.mule.connector.metrics.reporter;
 
 import com.codahale.metrics.*;
-import com.codahale.metrics.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A reporter class for logging metrics values to a SLF4J {@link org.slf4j.Logger} periodically, similar to
- * {@link com.codahale.metrics.ConsoleReporter} or {@link com.codahale.metrics.CsvReporter}, but using the SLF4J framework instead. It also
- * supports specifying a {@link org.slf4j.Marker} instance that can be used by custom appenders and filters
+ * A reporter class for logging metrics values to a SLF4J {@link Logger} periodically, similar to
+ * {@link ConsoleReporter} or {@link CsvReporter}, but using the SLF4J framework instead. It also
+ * supports specifying a {@link Marker} instance that can be used by custom appenders and filters
  * for the bound logging toolkit to further process metrics reports.
  */
-public class KVPMetricsReporter extends ScheduledReporter {
+public class Slf4jReporterWithDeltas extends ScheduledReporter {
 
     private final Map<String, Long> timerCounts = new HashMap<String, Long>();
     long lastTimestamp = 0;
     private final Clock clock;
+    private final MetricRegistry registry;
 
     /**
-     * Returns a new {@link Builder} for {@link com.codahale.metrics.Slf4jReporter}.
+     * Returns a new {@link Builder} for {@link Slf4jReporter}.
      *
      * @param registry the registry to report
-     * @return a {@link Builder} instance for a {@link com.codahale.metrics.Slf4jReporter}
+     * @return a {@link Builder} instance for a {@link Slf4jReporter}
      */
     public static Builder forRegistry(MetricRegistry registry) {
         return new Builder(registry);
@@ -35,7 +38,7 @@ public class KVPMetricsReporter extends ScheduledReporter {
     public enum LoggingLevel {TRACE, DEBUG, INFO, WARN, ERROR}
 
     /**
-     * A builder for {@link com.codahale.metrics.Slf4jReporter} instances. Defaults to logging to {@code metrics}, not
+     * A builder for {@link Slf4jReporter} instances. Defaults to logging to {@code metrics}, not
      * using a marker, converting rates to events/second, converting durations to milliseconds, and
      * not filtering metrics.
      */
@@ -61,7 +64,7 @@ public class KVPMetricsReporter extends ScheduledReporter {
         /**
          * Log metrics to the given logger.
          *
-         * @param logger an SLF4J {@link org.slf4j.Logger}
+         * @param logger an SLF4J {@link Logger}
          * @return {@code this}
          */
         public Builder outputTo(Logger logger) {
@@ -72,7 +75,7 @@ public class KVPMetricsReporter extends ScheduledReporter {
         /**
          * Mark all logged metrics with the given marker.
          *
-         * @param marker an SLF4J {@link org.slf4j.Marker}
+         * @param marker an SLF4J {@link Marker}
          * @return {@code this}
          */
         public Builder markWith(Marker marker) {
@@ -105,7 +108,7 @@ public class KVPMetricsReporter extends ScheduledReporter {
         /**
          * Only report metrics which match the given filter.
          *
-         * @param filter a {@link com.codahale.metrics.MetricFilter}
+         * @param filter a {@link MetricFilter}
          * @return {@code this}
          */
         public Builder filter(MetricFilter filter) {
@@ -125,11 +128,11 @@ public class KVPMetricsReporter extends ScheduledReporter {
         }
 
         /**
-         * Builds a {@link com.codahale.metrics.Slf4jReporter} with the given properties.
+         * Builds a {@link Slf4jReporter} with the given properties.
          *
-         * @return a {@link com.codahale.metrics.Slf4jReporter}
+         * @return a {@link Slf4jReporter}
          */
-        public KVPMetricsReporter build() {
+        public Slf4jReporterWithDeltas build() {
             LoggerProxy loggerProxy;
             switch (loggingLevel) {
                 case TRACE:
@@ -149,23 +152,24 @@ public class KVPMetricsReporter extends ScheduledReporter {
                     loggerProxy = new DebugLoggerProxy(logger);
                     break;
             }
-            return new KVPMetricsReporter(registry, loggerProxy, marker, rateUnit, durationUnit, filter);
+            return new Slf4jReporterWithDeltas(registry, loggerProxy, marker, rateUnit, durationUnit, filter);
         }
     }
 
     private final LoggerProxy loggerProxy;
     private final Marker marker;
 
-    private KVPMetricsReporter(MetricRegistry registry,
-                               LoggerProxy loggerProxy,
-                               Marker marker,
-                               TimeUnit rateUnit,
-                               TimeUnit durationUnit,
-                               MetricFilter filter) {
+    private Slf4jReporterWithDeltas(MetricRegistry registry,
+                                    LoggerProxy loggerProxy,
+                                    Marker marker,
+                                    TimeUnit rateUnit,
+                                    TimeUnit durationUnit,
+                                    MetricFilter filter) {
         super(registry, "logger-reporter", filter, rateUnit, durationUnit);
         this.loggerProxy = loggerProxy;
         this.marker = marker;
         this.clock = Clock.defaultClock();
+        this.registry = registry;
     }
 
     @Override
@@ -177,11 +181,13 @@ public class KVPMetricsReporter extends ScheduledReporter {
 
         final long timestamp = TimeUnit.MILLISECONDS.toSeconds(clock.getTime());
 
-        for (Entry<String, Counter> entry : counters.entrySet()) {
-            logCounter(entry.getKey(), entry.getValue());
+        if ( counterValueChanged( counters.entrySet() ) ) {
+            for (Entry<String, Counter> entry : counters.entrySet()) {
+                logCounter(timestamp, entry.getKey(), entry.getValue());
+            }
         }
 
-        if ( valueChanged( timers.entrySet() ) ) {
+        if ( timerValueChanged( timers.entrySet() ) ) {
             for (Entry<String, Timer> entry : timers.entrySet()) {
                 logTimer(timestamp, entry.getKey(), entry.getValue());
             }
@@ -196,13 +202,34 @@ public class KVPMetricsReporter extends ScheduledReporter {
      * @param timers
      * @return
      */
-    private boolean valueChanged( Set<Entry<String, Timer>> timers ) {
+    private boolean timerValueChanged( Set<Entry<String, Timer>> timers ) {
 
         for (Entry<String, Timer> entry : timers) {
             String name = entry.getKey();
             Timer nextTimer = entry.getValue();
             Long lastSample = timerCounts.get( name );
             if ( lastSample == null || ( lastSample.compareTo( nextTimer.getCount() ) != 0 ) ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Method to only report data when counter values have changed
+     *
+     * @param counters
+     * @return
+     */
+    private boolean counterValueChanged( Set<Entry<String, Counter>> counters ) {
+
+        for (Entry<String, Counter> entry : counters) {
+            String name = entry.getKey();
+            Counter nextCounter = entry.getValue();
+            Long lastSample = timerCounts.get( name );
+
+            if ( lastSample == null || ( lastSample.compareTo( nextCounter.getCount() ) != 0 ) )  {
                 return true;
             }
         }
@@ -222,30 +249,27 @@ public class KVPMetricsReporter extends ScheduledReporter {
         final Snapshot snapshot = timer.getSnapshot();
         Long totalCount = timer.getCount();
 
-        double rate = 0.0d;
-        long count = 0;
-        long elapsed = 0;
+        double deltaRate = 0.0d;
+        long delta = 0;
+        long interval = 0;
 
         if ( lastTimestamp > 0 ) {
-            elapsed = timestamp - lastTimestamp;
+            interval = timestamp - lastTimestamp;
             Long lastSample = timerCounts.get( name );
 
-            if ( elapsed > 0 && lastSample != null ) {
-                count = ( totalCount - lastSample );
-                rate = count / (double)elapsed;
+            if ( interval > 0 && lastSample != null ) {
+                delta = ( totalCount - lastSample );
+                deltaRate = delta / (double)interval;
             }
         }
 
         timerCounts.put( name, totalCount );
         loggerProxy.log(marker,
-                "type=TIMER, category={}, elapsed={}, count={}, totalCount={}, rate={}, m1={}, min={}, max={}, mean={}, " +
+                "type=TIMER, category={}, timestamp={}, total_count={}, interval={}, delta={}, delta_rate={}, m1={}, min={}, max={}, mean={}, " +
                         "p75={}, p95={}, p98={}, p99={}, p999={}, " +
                         "rate_unit={}, duration_unit={}",
-                name,
-                elapsed,
-                count,
-                timer.getCount(),
-                rate,
+                name, timestamp, totalCount,
+                interval, delta, deltaRate,
                 convertRate(timer.getOneMinuteRate()),
                 convertDuration(snapshot.getMin()),
                 convertDuration(snapshot.getMax()),
@@ -259,8 +283,22 @@ public class KVPMetricsReporter extends ScheduledReporter {
                 getDurationUnit());
     }
 
-    private void logCounter(String name, Counter counter) {
-        loggerProxy.log(marker, "type=COUNTER, name={}, count={}", name, counter.getCount());
+    private void logCounter(long timestamp, String name, Counter counter) {
+        long totalCount =  counter.getCount();
+        long delta = 0;
+        long interval = 0;
+
+        if ( lastTimestamp > 0 ) {
+            interval = timestamp - lastTimestamp;
+            Long lastSample = timerCounts.get( name );
+
+            if ( interval > 0 && lastSample != null ) {
+                delta = ( totalCount - lastSample );
+            }
+        }
+        timerCounts.put( name, totalCount );
+
+        loggerProxy.log(marker, "type=COUNTER, name={}, timestamp={}, total_count={}, interval={}, delta={}", name, timestamp, counter.getCount(), interval, delta);
     }
 
     @Override
