@@ -249,7 +249,7 @@ public class Slf4jReporterWithDeltas extends ScheduledReporter {
         final Snapshot snapshot = timer.getSnapshot();
         Long totalCount = timer.getCount();
 
-        double deltaRate = 0.0d;
+        double intervalRate = 0.0d;
         long delta = 0;
         long interval = 0;
 
@@ -259,17 +259,17 @@ public class Slf4jReporterWithDeltas extends ScheduledReporter {
 
             if ( interval > 0 && lastSample != null ) {
                 delta = ( totalCount - lastSample );
-                deltaRate = delta / (double)interval;
+                intervalRate = delta / (double)interval;
             }
         }
 
         timerCounts.put( name, totalCount );
         loggerProxy.log(marker,
-                "type=TIMER, category={}, timestamp={}, total_count={}, interval={}, delta={}, delta_rate={}, m1={}, min={}, max={}, mean={}, " +
+                "type=TIMER, category={}, timestamp={}, total_count={}, interval={}, delta={}, interval_rate={}, m1={}, min={}, max={}, mean={}, " +
                         "p75={}, p95={}, p98={}, p99={}, p999={}, " +
                         "rate_unit={}, duration_unit={}",
                 name, timestamp, totalCount,
-                interval, delta, deltaRate,
+                interval, delta, intervalRate,
                 convertRate(timer.getOneMinuteRate()),
                 convertDuration(snapshot.getMin()),
                 convertDuration(snapshot.getMax()),
