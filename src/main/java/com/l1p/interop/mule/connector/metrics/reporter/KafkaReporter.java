@@ -64,11 +64,9 @@ public class KafkaReporter extends ScheduledReporter {
                      SortedMap<String, Meter> meters,
                      SortedMap<String, Timer> timers) {
 
-    Timer.Context reportDuration = null;
+    Timer timer = null;
+    long startTime = System.currentTimeMillis();
     try {
-      logger.info("begin report");
-      final Timer timer = registry.timer("reporter.kakfka.report.duration");
-      reportDuration = timer.time();
       final long timestamp = clock.getTime();
 
       for (Map.Entry<String, Gauge> entry : gauges.entrySet()) {
@@ -90,9 +88,12 @@ public class KafkaReporter extends ScheduledReporter {
       for (Map.Entry<String, Timer> entry : timers.entrySet()) {
         reportTimer(timestamp, entry.getKey(), entry.getValue());
       }
-      logger.info("end report");
     } finally {
-      if (reportDuration != null) reportDuration.stop();
+      long duration = System.currentTimeMillis() - startTime;
+      if ( duration > 500 ) {
+        //only record this value if it becomes an issue
+        registry.timer("reporter.kakfka.report.duration").update(duration, TimeUnit.MILLISECONDS);
+      }
     }
   }
 
