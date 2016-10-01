@@ -52,6 +52,7 @@ target/
 **/*.mflow
 studio_id.xml
 fhlb-demo/mule-project.xml
+MetricsTest/
 
 # --------------- #
 # IntelliJ #

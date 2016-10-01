@@ -3,9 +3,16 @@ package com.l1p.interop.mule.connector.metrics.spring;
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
+
 import org.slf4j.LoggerFactory;
 
+import com.l1p.interop.mule.connector.metrics.reporter.KafkaReporter;
+import com.l1p.interop.mule.connector.metrics.reporter.MetricKafkaProducer;
+import com.l1p.interop.mule.connector.metrics.reporter.CsvReporterWithDeltas;
+import com.l1p.interop.mule.connector.metrics.reporter.Slf4jReporterWithDeltas;
+
 import java.util.concurrent.TimeUnit;
+import java.io.File;
 
 public class ReporterFactory {
 
@@ -33,6 +40,27 @@ public class ReporterFactory {
         .convertRatesTo(TimeUnit.SECONDS)
         .convertDurationsTo(TimeUnit.MILLISECONDS)
         .build();
+  }
+
+  public static final KafkaReporter createKafkaReporter(MetricRegistry metricRegistry, String kafkaTopic, MetricKafkaProducer producer, String env, String app) {
+    return KafkaReporter.forRegistry(metricRegistry, kafkaTopic, producer, env, app)
+        .convertRatesTo(TimeUnit.SECONDS)
+        .convertDurationsTo(TimeUnit.MILLISECONDS)
+        .build();
+  }
+
+  public static final CsvReporterWithDeltas createCsvReporterWithDeltas(MetricRegistry metricRegistry, String directory, String env, String app) {
+    return CsvReporterWithDeltas.forRegistry(metricRegistry, new File( directory ), env, app)
+            .convertRatesTo(TimeUnit.SECONDS)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .build( new File( directory ) );
+  }
+
+  public static final Slf4jReporterWithDeltas createSlf4jReporterWithDeltas(MetricRegistry metricRegistry) {
+    return Slf4jReporterWithDeltas.forRegistry(metricRegistry)
+            .convertRatesTo(TimeUnit.SECONDS)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .build();
   }
 
 }

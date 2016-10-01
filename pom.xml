@@ -1,67 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.l1p.interop</groupId>
-	<artifactId>interop-mule-connector-metrics</artifactId>
-	<version>1.0.14-SNAPSHOT</version>
-	<packaging>mule-module</packaging>
-	<name>Mule Metrics Anypoint Connector</name>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.l1p.interop</groupId>
+  <artifactId>interop-mule-connector-metrics</artifactId>
+  <version>1.0.21-SNAPSHOT</version>
+  <packaging>mule-module</packaging>
+  <name>Mule Metrics Anypoint Connector</name>
 
-	<parent>
-		<groupId>org.mule.tools.devkit</groupId>
-		<artifactId>mule-devkit-parent</artifactId>
-		<version>3.8.0</version>
-	</parent>
+  <parent>
+    <groupId>org.mule.tools.devkit</groupId>
+    <artifactId>mule-devkit-parent</artifactId>
+    <version>3.8.0</version>
+  </parent>
 
-	<properties>
-		<category>Community</category>
-		<licensePath>LICENSE.md</licensePath>
-		<devkit.studio.package.skip>false</devkit.studio.package.skip>
-		<project.scm.id>Level1Git</project.scm.id>
-		<maven.javadoc.skip>true</maven.javadoc.skip>
-	</properties>
+  <properties>
+    <category>Community</category>
+    <licensePath>LICENSE.md</licensePath>
+    <devkit.studio.package.skip>false</devkit.studio.package.skip>
+    <project.scm.id>Level1Git</project.scm.id>
+    <maven.javadoc.skip>true</maven.javadoc.skip>
+    <kafka.version>0.10.0.0</kafka.version>
+  </properties>
 
-	<scm>
-		<connection>scm:git:https://github.com/LevelOneProject/interop-mule-connector-metrics.git</connection>
-		<developerConnection>scm:git:https://github.com/LevelOneProject/interop-mule-connector-metrics.git</developerConnection>
-		<url>https://github.com/LevelOneProject/interop-mule-connector-metrics</url>
-		<tag>HEAD</tag>
-	</scm>
-	
-	<distributionManagement>
-		<repository>
-			<id>modusbox-release-local</id>
-			<name>libs-release-local</name>
-			<url>https://modusbox.jfrog.io/modusbox/libs-release-local</url>
-		</repository>
-		<snapshotRepository>
-			<id>modusbox-snapshot-local</id>
-			<name>libs-snapshot-local</name>
-			<url>https://modusbox.jfrog.io/modusbox/libs-snapshot-local</url>
-		</snapshotRepository>
-	</distributionManagement>
+  <scm>
+    <connection>scm:git:https://github.com/LevelOneProject/interop-mule-connector-metrics.git</connection>
+    <developerConnection>scm:git:https://github.com/LevelOneProject/interop-mule-connector-metrics.git
+    </developerConnection>
+    <url>https://github.com/LevelOneProject/interop-mule-connector-metrics</url>
+    <tag>HEAD</tag>
+  </scm>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
-				<configuration>
-					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<pushChanges>true</pushChanges>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+  <distributionManagement>
+    <repository>
+      <id>modusbox-release-local</id>
+      <name>libs-release-local</name>
+      <url>https://modusbox.jfrog.io/modusbox/libs-release-local</url>
+    </repository>
+    <snapshotRepository>
+      <id>modusbox-snapshot-local</id>
+      <name>libs-snapshot-local</name>
+      <url>https://modusbox.jfrog.io/modusbox/libs-snapshot-local</url>
+    </snapshotRepository>
+  </distributionManagement>
 
-	<dependencies>
-		<!-- https://mvnrepository.com/artifact/io.dropwizard.metrics/metrics-core -->
-		<dependency>
-			<groupId>io.dropwizard.metrics</groupId>
-			<artifactId>metrics-core</artifactId>
-			<version>3.1.2</version>
-		</dependency>
-	</dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.5.3</version>
+        <configuration>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <pushChanges>true</pushChanges>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <!-- https://mvnrepository.com/artifact/io.dropwizard.metrics/metrics-core -->
+    <dependency>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-core</artifactId>
+      <version>3.1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-clients</artifactId>
+      <version>${kafka.version}</version>
+    </dependency>
+  </dependencies>
 </project>

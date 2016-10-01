@@ -52,7 +52,7 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
             <vm:outbound-endpoint exchange-pattern="one-way" path="process.demo" connector-ref="VM" doc:name="VM"/>
          </foreach>
  -->
-        <expression-component doc:name="Sleep 10s"><![CDATA[Thread.sleep(10000);]]></expression-component>
+        <expression-component doc:name="Sleep 10s"><![CDATA[Thread.sleep(100);]]></expression-component>
         <metrics:inc-count config-ref="Metrics__Configuration" category="CounterCategory" doc:name="Counter 2">
             <metrics:metric-keys>
                 <metrics:metric-key>Counter1</metrics:metric-key>
@@ -61,7 +61,7 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
 
         <metrics:snap-time config-ref="Metrics__Configuration" snapTimeKey="begin_snap" doc:name="Metrics"/>
 
-        <expression-component doc:name="Sleep 10s"><![CDATA[Thread.sleep(10000);]]></expression-component>
+        <expression-component doc:name="Sleep 10s"><![CDATA[Thread.sleep(100);]]></expression-component>
         <metrics:snap-time config-ref="Metrics__Configuration" snapTimeKey="end_snap" doc:name="Metrics"/>
 
         <metrics:time config-ref="Metrics__Configuration" beginSnapKey="begin_snap" category="TimerCategory" endSnapKey="end_snap" metricKey="demo.time" doc:name="Metrics Record"/>
