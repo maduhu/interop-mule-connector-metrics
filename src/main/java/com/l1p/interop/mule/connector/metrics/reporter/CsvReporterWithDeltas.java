@@ -177,7 +177,10 @@ public class CsvReporterWithDeltas extends ScheduledReporter {
             File e = new File(this.directory, this.sanitize(name) + ".csv");
             boolean fileAlreadyExists = e.exists();
             if(fileAlreadyExists || e.createNewFile()) {
-                PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(e, true), UTF_8));
+                FileOutputStream fOutStream = new FileOutputStream(e, true);
+                OutputStreamWriter oStreamWriter = new OutputStreamWriter (fOutStream, UTF_8);
+                PrintWriter out = new PrintWriter(oStreamWriter);
+                //PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(e, true), UTF_8));
 
                 try {
                     if(!fileAlreadyExists) {
@@ -187,6 +190,8 @@ public class CsvReporterWithDeltas extends ScheduledReporter {
                     out.printf(this.locale, String.format(this.locale, "%d,%s%n", new Object[]{Long.valueOf(timestamp), line}), values);
                 } finally {
                     out.close();
+                    oStreamWriter.close();
+                    fOutStream.close();
                 }
             }
         } catch (IOException var14) {
