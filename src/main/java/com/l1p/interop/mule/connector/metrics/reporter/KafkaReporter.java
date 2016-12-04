@@ -166,9 +166,14 @@ public class KafkaReporter extends ScheduledReporter {
 
   private void report(long timestamp, String name, MetricType metricType, String line, Object... values) {
     final Formatter formatter = new Formatter(locale);
-    final String metric = formatter.format(String.format(locale, "%s,%s,%s,%s,%d,%s", metricType, env, app, name, timestamp, line), values).toString();
-    final String metricKey = MetricRegistry.name(env, app, name);
-    metricKafkaProducer.send(kafkaTopic, metricKey, metric);
+
+    try {
+      final String metric = formatter.format(String.format(locale, "%s,%s,%s,%s,%d,%s", metricType, env, app, name, timestamp, line), values).toString();
+      final String metricKey = MetricRegistry.name(env, app, name);
+      metricKafkaProducer.send(kafkaTopic, metricKey, metric);
+    } finally {
+      formatter.close();
+    }
 
   }
 
