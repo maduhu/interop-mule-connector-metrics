@@ -1,6 +1,7 @@
 package com.l1p.interop.mule.connector.metrics.spring;
 
 import com.codahale.metrics.ConsoleReporter;
+import com.codahale.metrics.CsvReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
 
@@ -47,6 +48,13 @@ public class ReporterFactory {
         .convertRatesTo(TimeUnit.SECONDS)
         .convertDurationsTo(TimeUnit.MILLISECONDS)
         .build();
+  }
+
+  public static final CsvReporter createCsvReporter(MetricRegistry metricRegistry, String dir) {
+    return CsvReporter.forRegistry(metricRegistry)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .convertRatesTo(TimeUnit.SECONDS)
+            .build(new File(dir));
   }
 
   public static final CsvReporterWithDeltas createCsvReporterWithDeltas(MetricRegistry metricRegistry, String directory, String env, String app) {
