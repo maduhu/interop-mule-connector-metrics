@@ -1,13 +1,17 @@
-# Metrics Anypoint Connector
+
+
+# interop-mule-connector-metrics
+
+Metrics Anypoint Connector
 
 [Connector description including destination service or application with]
 
-# Mule supported versions
+Mule supported versions
 Examples:
 Mule 3.4.x, 3.5.x
 Mule 3.4.1
 
-# [Destination service or application name] supported versions
+[Destination service or application name] supported versions
 Example:
 Oracle E-Business Suite 12.1 and above.
 
@@ -19,16 +23,49 @@ or
 Salesforce API v.24
 Salesforce Metadata API
 
+Contents:
 
-# Installation 
+- [Deployment](#deployment)
+- [Configuration](#configuration)
+- [API](#api)
+- [Logging](#logging)
+- [Tests](#tests)
+
+## Deployment
+
+Installation 
+
 For beta connectors you can download the source code and build it with devkit to find it available on your local repository. Then you can add it to Studio
 
 For released connectors you can download them from the update site in Anypoint Studio. 
 Open Anypoint Studio, go to Help → Install New Software and select Anypoint Connectors Update Site where you’ll find all avaliable connectors.
 
-#Usage
+Usage
+
 For information about usage our documentation at http://github.com/mulesoft/metrics.
 
-# Reporting Issues
+## Configuration
+
+(Location of Ansible playbooks that configure this code.)
+
+(Explanation of important config parameters)
+
+## API
+
+This repo does not contain an API.
+
+## Logging
+
+(Where are the logs?)
+
+(Explain important things about what gets logged or how to interpret the logs. Use subheaders if necessary.)
+
+## Tests
+
+(Explain what's covered, and what's not covered, by the tests. At this level, it's usually just unit tests.)
+
+(Explain how to run the tests)
+
+### Reporting Issues
 
 We use GitHub:Issues for tracking issues with this connector. You can report new issues at this link http://github.com/mulesoft/metrics/issues.
