@@ -46,25 +46,21 @@ For information about usage our documentation at http://github.com/mulesoft/metr
 
 ## Configuration
 
-(Location of Ansible playbooks that configure this code.)
-
-(Explanation of important config parameters)
+[pom.xml](./pom.xml) and [circle.yml](./circle.yml) can be found in the repo
 
 ## API
 
-This repo does not contain an API.
+This repo does not have an API.
 
 ## Logging
 
-(Where are the logs?)
+Server path to logs is: <mule_home>/logs/*.log
 
-(Explain important things about what gets logged or how to interpret the logs. Use subheaders if necessary.)
+Metrics details are logged based on configuration to console, csv and/or log files. Every app currently has metrics connector configured to record several metrics and then log these details, which include time taken for HTTP calls, average times and such similar statistics.
 
 ## Tests
 
-(Explain what's covered, and what's not covered, by the tests. At this level, it's usually just unit tests.)
-
-(Explain how to run the tests)
+Metrics tests are a bit different from other tests for interop projects as this is not a typical service or interop project. There are tests to test the functionality of each of the loggers such as csv or slf4j.
 
 ### Reporting Issues
 
