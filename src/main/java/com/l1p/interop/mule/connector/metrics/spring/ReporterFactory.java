@@ -47,7 +47,7 @@ public class ReporterFactory {
     return KafkaReporter.forRegistry(metricRegistry, kafkaTopic, producer, env, app)
         .convertRatesTo(TimeUnit.SECONDS)
         .convertDurationsTo(TimeUnit.MILLISECONDS)
-        .build();
+        .build(); 
   }
 
   public static final CsvReporter createCsvReporter(MetricRegistry metricRegistry, String dir) {

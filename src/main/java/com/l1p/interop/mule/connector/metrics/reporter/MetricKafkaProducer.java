@@ -19,11 +19,12 @@ public class MetricKafkaProducer {
   }
 
   public static void main(String[] args) {
-    final MetricKafkaProducer metricKafkaProducer = new MetricKafkaProducer("ec2-52-26-168-223.us-west-2.compute.amazonaws.com:9092", "main-test");
+    final MetricKafkaProducer metricKafkaProducer = new MetricKafkaProducer("ec2-35-164-199-6.us-west-2.compute.amazonaws.com:9092", "main-test");
 
     for (int i = 0; i < 10; i++) {
       metricKafkaProducer.send("test", String.valueOf(i), String.valueOf(i));
     }
+    
     metricKafkaProducer.close();
   }
 
@@ -45,7 +46,9 @@ public class MetricKafkaProducer {
    * @param values
    */
   public void send(String topic, String metricKey, String values) {
+	  System.out.println("about to send a message");
     kafkaProducer.send(new ProducerRecord<>(topic, metricKey, values));
+    System.out.println("after send message");
   }
 
   public void close() {
