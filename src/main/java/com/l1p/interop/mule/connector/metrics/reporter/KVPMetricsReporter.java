@@ -260,7 +260,11 @@ public class KVPMetricsReporter extends ScheduledReporter {
     }
 
     private void logCounter(String name, Counter counter) {
-        loggerProxy.log(marker, "type=COUNTER, name={}, count={}", name, counter.getCount());
+    	System.out.println("in logCounter.  Name = " + name + ", counter count = " + counter.getCount());  // <<<<<<<<<<<<<<< delete after unit testing.
+        if (marker != null) 
+        	System.out.println("marker is null");
+        
+    	loggerProxy.log(marker, "type=COUNTER, name={}, count={}", name, counter.getCount());
     }
 
     @Override

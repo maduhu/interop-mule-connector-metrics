@@ -100,7 +100,7 @@ public class CsvReporterWithDeltasTests {
 		
 		reporter.build(newDirectory).report(createGauges(), createCounters(), createdHistogramData(), createMeterData(), createTimerData());
 		
-		
+		// Seems like we need to add some asserts here to ensure that we got valid output.  
 		
 	}
 	

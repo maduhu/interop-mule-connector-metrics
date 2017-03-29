@@ -34,12 +34,4 @@ public class MetricConnectorTests extends SimpleCallableJavaComponentTestCase {
 		
 	}
 
-//	@Test
-//	public void testConnectorConfigSetters() {
-//		connector = new MetricsConnector();
-//		
-//		
-//		fail("Not yet implemented");
-//	}
-
 }
