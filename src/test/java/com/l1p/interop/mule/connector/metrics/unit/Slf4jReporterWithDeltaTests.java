@@ -23,21 +23,21 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Reservoir;
 import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
-import com.l1p.interop.mule.connector.metrics.reporter.KVPMetricsReporter;
-import com.l1p.interop.mule.connector.metrics.reporter.KVPMetricsReporter.Builder;
-import com.l1p.interop.mule.connector.metrics.reporter.KVPMetricsReporter.LoggingLevel;
+import com.l1p.interop.mule.connector.metrics.reporter.Slf4jReporterWithDeltas;
+import com.l1p.interop.mule.connector.metrics.reporter.Slf4jReporterWithDeltas.LoggingLevel;
 
-public class KVPMetricsReporterTests {
-	
+public class Slf4jReporterWithDeltaTests {
 
 	@Test
-	public void testForRegistry() {
+	public void test() {
+		Slf4jReporterWithDeltas x = null;
+		
 		MetricRegistry registry = new MetricRegistry();
 		Timer timer = new Timer();
 		timer.update(100L, TimeUnit.MILLISECONDS);
 		
-		Builder builder = null;
-		KVPMetricsReporter reporter;
+		Slf4jReporterWithDeltas.Builder builder = null;
+		Slf4jReporterWithDeltas reporter;
 		
 		Counter counter = new Counter();
 		counter.inc(1);
@@ -45,7 +45,7 @@ public class KVPMetricsReporterTests {
 		registry.register("metrics-csv-reporting-timer", timer);
 		registry.register("metrics-csv-reporting-counter", counter);
 		
-		KVPMetricsReporter.Builder b = KVPMetricsReporter.forRegistry(registry);
+		Slf4jReporterWithDeltas.Builder b = Slf4jReporterWithDeltas.forRegistry(registry);
 		b.markWith(createTestMarker("LogLocation1"));
 		
 		
@@ -103,8 +103,7 @@ public class KVPMetricsReporterTests {
         
 	}
 	
-	
-	private Marker createTestMarker(String name) {
+private Marker createTestMarker(String name) {
 		
 		Marker marker = MarkerFactory.getMarker(name);
 		return marker;
@@ -286,8 +285,6 @@ public class KVPMetricsReporterTests {
 		
 		return filter;
 	}
-	
-	
 	
 
 }

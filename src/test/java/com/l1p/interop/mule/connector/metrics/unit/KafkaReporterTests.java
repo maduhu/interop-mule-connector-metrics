@@ -105,20 +105,6 @@ public class KafkaReporterTests {
 	}
 	
 	
-//	@Test
-//	public void testSantize() {
-//		KafkaReporter r = new KafkaReporter();
-//		
-//		kafkaBuilder.filter(new MetricFilter() {
-//			
-//			@Override
-//			public boolean matches(String arg0, Metric arg1) {
-//				return false;
-//			}
-//		});
-//	}
-	
-	
 	private SortedMap<String, Timer> createTimerData() {
 		SortedMap<String, Timer> timers = new TreeMap<>();
 		Timer timer = new Timer();
