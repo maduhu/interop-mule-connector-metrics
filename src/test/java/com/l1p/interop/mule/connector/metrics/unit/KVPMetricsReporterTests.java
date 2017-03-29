@@ -106,23 +106,6 @@ public class KVPMetricsReporterTests {
 	}
 	
 	
-	@Test
-	public void testReport() {
-		
-		MetricRegistry registry = new MetricRegistry();
-		Timer timer = new Timer();
-		timer.update(100L, TimeUnit.MILLISECONDS);
-		
-		Counter counter = new Counter();
-		counter.inc(1);
-		
-		registry.register("metrics-csv-reporting-timer", timer);
-		registry.register("metrics-csv-reporting-counter", counter);
-		
-//		KVPMetricsReporter reporter = new KVPMetricsReporter(registry, KVPMetricsReporter., createTestMarker(), TimeUnit.MILLISECONDS, TimeUnit.HOURS, createTestMetricFilter());
-	}
-	
-	
 	private Marker createTestMarker(String name) {
 		
 		Marker marker = MarkerFactory.getMarker(name);
@@ -134,12 +117,19 @@ public class KVPMetricsReporterTests {
 		SortedMap<String, Timer> timers = new TreeMap<>();
 		
 		Timer timer = new Timer();
-		timer.update(105L, TimeUnit.MILLISECONDS);
-		timers.put("p95", timer);
+		timer.update(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+		timers.put("p"+System.currentTimeMillis(), timer);
+		
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 		timer = new Timer();
 		timer.update(119L, TimeUnit.MILLISECONDS);
-		timers.put("p95", timer);
+//		timers.put("p95", timer);
+		timers.put("p"+System.currentTimeMillis(), timer);
 		
 		System.out.println("Just created timers. Count = " + timers.size());
 		
