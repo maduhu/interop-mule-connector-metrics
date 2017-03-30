@@ -1,28 +1,29 @@
 package com.l1p.interop.mule.connector.metrics.unit;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.component.SimpleCallableJavaComponentTestCase;
 
 import com.codahale.metrics.Counter;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.ScheduledReporter;
 import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
-import com.codahale.metrics.Timer.Context;
 import com.l1p.interop.mule.connector.metrics.MetricsConnector;
 import com.l1p.interop.mule.connector.metrics.config.ConnectorConfig;
 
@@ -149,8 +150,63 @@ public class MetricConnectorTests extends SimpleCallableJavaComponentTestCase {
 		c.incCount(category, metricKeys, 25);
 		c.decCount(category, metricKeys, 19);
 		
+	}
+
+	
+	@Test
+	public void testStartAndStopConnector() {
+		MetricsConnector connector = new MetricsConnector();
+		ConnectorConfig config = new ConnectorConfig();
+		MetricRegistry registry = new MetricRegistry();
 		
+		connector.setConfig(config);
+		config.setReporterInterval(100);
+		config.setScheduledReporters( createTestScheduledReporters(registry, "reports") );
+		connector.startConnector();
+	
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			fail("failed to run Thread.sleep() between start and stop of scheduled reporter");
+		}
+		
+		connector.stopConnector();
 	}
 	
+	
+	private List<ScheduledReporter> createTestScheduledReporters(MetricRegistry registry, String name) {
+		
+		List<ScheduledReporter> reporters = new ArrayList<ScheduledReporter>();
+		
+		ScheduledReporter sr = new ScheduledReporter(registry, name, createTestFilter(), TimeUnit.SECONDS, TimeUnit.MILLISECONDS) {
+			
+			@Override
+			public void report(SortedMap<String, Gauge> arg0, SortedMap<String, Counter> arg1,
+					SortedMap<String, Histogram> arg2, SortedMap<String, Meter> arg3, SortedMap<String, Timer> arg4) {
+				
+				System.out.println("inside of teh anonymnous class method 'report'");
+			}
+		};
+		
+		reporters.add(sr);
+		
+		System.out.println("number of scheduled reporters in the list: " + reporters.size());
+		
+		return reporters;
+	}
+	
+	
+	private MetricFilter createTestFilter() {
+		MetricFilter filter = new MetricFilter() {
+			
+			@Override
+			public boolean matches(String arg0, Metric arg1) {
+				return false;
+			}
+		};
+		
+		return filter;
+	}
 
 }
