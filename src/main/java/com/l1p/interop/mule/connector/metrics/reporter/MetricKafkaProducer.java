@@ -3,11 +3,13 @@ package com.l1p.interop.mule.connector.metrics.reporter;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
 public class MetricKafkaProducer {
-
+  private static Logger log = LoggerFactory.getLogger(MetricKafkaProducer.class);
   private final String servers;
   private Producer<String, String> kafkaProducer;
   private String clientId;
