@@ -183,6 +183,7 @@ public class KVPMetricsReporter extends ScheduledReporter {
 
         if ( valueChanged( timers.entrySet() ) ) {
             for (Entry<String, Timer> entry : timers.entrySet()) {
+            	System.out.println("found a timeer entry");
                 logTimer(timestamp, entry.getKey(), entry.getValue());
             }
         }
@@ -260,7 +261,7 @@ public class KVPMetricsReporter extends ScheduledReporter {
     }
 
     private void logCounter(String name, Counter counter) {
-        loggerProxy.log(marker, "type=COUNTER, name={}, count={}", name, counter.getCount());
+    	loggerProxy.log(marker, "type=COUNTER, name={}, count={}", name, counter.getCount());
     }
 
     @Override
